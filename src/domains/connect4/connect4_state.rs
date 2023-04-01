@@ -21,7 +21,7 @@ pub struct Connect4State {
 }
 
 impl Connect4State {
-    fn player_1_turn(&self) -> bool {
+    pub fn player_1_turn(&self) -> bool {
         return Connect4State::count_ones(self.bit_board_1) <= Connect4State::count_ones(self.bit_board_2);
     }
 

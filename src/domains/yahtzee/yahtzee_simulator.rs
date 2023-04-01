@@ -3,12 +3,12 @@ use std::collections::HashSet;
 use rand::{SeedableRng, RngCore};
 use rand_chacha::ChaCha8Rng;
 
-use crate::core::simulator::{Simulator, LegalActions};
+use crate::core::{simulator::{Simulator, LegalActions}, reward::Reward};
 
 use super::{yahtzee_state::YahtzeeState, yahtzee_action::YahtzeeAction, yahtzee_score_category::YahtzeeScoreCategory, yahtzee_constants::{N_VALUES, N_DICE}};
 
-const BONUS_THRESHOLD: i32 = 63;
-const BONUS_SCORE: i32 = 35;
+const BONUS_THRESHOLD: u16 = 63;
+const BONUS_SCORE: u16 = 35;
 const FULL_HOUSE_SCORE: u16 = 25;
 const SMALL_STRAIGHT_SCORE: u16 = 30;
 const LARGE_STRAIGHT_SCORE: u16 = 40;
@@ -47,21 +47,21 @@ impl Simulator<YahtzeeState, YahtzeeAction> for YahtzeeSimulator {
         }
     }
 
-    fn calculate_rewards(&self, state: &YahtzeeState) -> Vec<i32> {
-        let mut rewards = Vec::with_capacity(1);
+    fn calculate_rewards(&mut self, state: &YahtzeeState) -> Vec<Reward> {
+        let mut score = 0u16;
         if !state.has_categories_left() {
-            let scores = state.scores.iter().map(|&x| x.unwrap_or(0) as i32).collect::<Vec<i32>>();
+            let scores = state.scores.iter().map(|&x| x.unwrap_or(0) as u16).collect::<Vec<u16>>();
             for i in 0..N_VALUES {
-                rewards[0] += scores[i];
+                score += scores[i];
             }
-            if rewards[0] >= BONUS_THRESHOLD {
-                rewards[0] += BONUS_SCORE;
+            if score >= BONUS_THRESHOLD {
+                score += BONUS_SCORE;
             }
             for i in N_VALUES..scores.len() {
-                rewards[0] += scores[i];
+                score += scores[i];
             }
         }
-        rewards
+        return vec![Reward::Score(score as isize)];
     }
 
     fn calculate_legal_actions(&self, state: &YahtzeeState) -> Vec<LegalActions<YahtzeeAction>> {

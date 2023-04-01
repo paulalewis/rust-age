@@ -4,12 +4,29 @@ use std::vec::Vec;
 use std::collections::hash_map::HashMap;
 use std::collections::hash_set::HashSet;
 
+use super::reward::Reward;
+
 pub trait Action : Clone + fmt::Display + Hash + Eq {}
 pub trait State : Clone + fmt::Display + Hash + Eq {
     fn get_current_player_ids(&self) -> Vec<usize>;
 }
 
+#[derive(Clone)]
 pub struct LegalActions<A : Action>(pub HashSet<A>);
+
+impl <A : Action> LegalActions<A> {
+    pub fn new() -> Self {
+        LegalActions(HashSet::<A>::new())
+    }
+
+    pub fn insert(&mut self, action: A) {
+        self.0.insert(action);
+    }
+
+    pub fn iter(&self) -> std::collections::hash_set::Iter<A> {
+        self.0.iter()
+    }
+}
 
 impl <A : Action> fmt::Display for LegalActions<A> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -44,7 +61,7 @@ pub trait Simulator<S : State, A : Action> : Clone {
     /// 
     /// Returns a reward value for each player that can be
     /// indexed by the player ID.
-    fn calculate_rewards(&self, state: &S) -> Vec<i32>;
+    fn calculate_rewards(&mut self, state: &S) -> Vec<Reward>;
 
     /// @param state the state from which to calculate rewards
     /// @return list of legal actions for each player

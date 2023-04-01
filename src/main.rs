@@ -1,7 +1,3 @@
-mod domain;
-
-use crate::domain::Domain;
-
 use abstract_game_engine::core::agent::Agent;
 use abstract_game_engine::core::simulator::Simulator;
 use abstract_game_engine::core::agent::RandomAgent;
@@ -59,6 +55,10 @@ fn main() {
             }
         }
     };
+}
+enum Domain {
+    Connect4,
+    Yahtzee,
 }
 
 fn select_domain() -> Domain {
