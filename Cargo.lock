@@ -3,6 +3,15 @@
 version = 3
 
 [[package]]
+name = "abstract_game_engine"
+version = "0.1.0"
+dependencies = [
+ "enum-ordinalize",
+ "rand",
+ "rand_chacha",
+]
+
+[[package]]
 name = "autocfg"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -127,15 +136,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ec0be4795e2f6a28069bec0b5ff3e2ac9bafc99e6a9a7dc3547996c5c816922c"
 dependencies = [
  "getrandom",
-]
-
-[[package]]
-name = "rust-agl"
-version = "0.1.0"
-dependencies = [
- "enum-ordinalize",
- "rand",
- "rand_chacha",
 ]
 
 [[package]]

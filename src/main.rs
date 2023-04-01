@@ -1,17 +1,15 @@
-mod core;
 mod domain;
-mod domains;
 
-use crate::core::agent::Agent;
-use crate::core::simulator::Simulator;
-use domain::Domain;
+use crate::domain::Domain;
 
-use crate::core::agent::RandomAgent;
-use crate::core::agent::IoAgent;
-use crate::domains::connect4::connect4_action::Connect4Action;
-use crate::domains::connect4::connect4_simulator::Connect4Simulator;
-use crate::domains::yahtzee::yahtzee_action::YahtzeeAction;
-use crate::domains::yahtzee::yahtzee_simulator::YahtzeeSimulator;
+use abstract_game_engine::core::agent::Agent;
+use abstract_game_engine::core::simulator::Simulator;
+use abstract_game_engine::core::agent::RandomAgent;
+use abstract_game_engine::core::agent::IoAgent;
+use abstract_game_engine::domains::connect4::connect4_action::Connect4Action;
+use abstract_game_engine::domains::connect4::connect4_simulator::Connect4Simulator;
+use abstract_game_engine::domains::yahtzee::yahtzee_action::YahtzeeAction;
+use abstract_game_engine::domains::yahtzee::yahtzee_simulator::YahtzeeSimulator;
 
 use std::collections::HashMap;
 use std::io;
