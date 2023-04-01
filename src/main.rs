@@ -1,4 +1,5 @@
 use abstract_game_engine::core::agent::Agent;
+use abstract_game_engine::core::initial_state_generator::InitialStateGenerator;
 use abstract_game_engine::core::simulator::Simulator;
 use abstract_game_engine::core::agent::RandomAgent;
 use abstract_game_engine::core::agent::IoAgent;
@@ -19,10 +20,10 @@ fn main() {
         Domain::Connect4 => {
             println!("Connect 4");
             let mut simulator = Connect4Simulator::new();
-            let mut current_state = simulator.initial_state();
+            let mut current_state = simulator.generate_initial_state();
             loop {
                 println!("{}", current_state);
-                let action = io_agent.select_action(0, &current_state, &simulator);
+                let action = io_agent.select_action(0, &current_state, &mut simulator);
                 match action {
                     Some(action) => {
                         let mut selected_actions: HashMap<usize, Connect4Action> = HashMap::new();
@@ -38,10 +39,10 @@ fn main() {
         Domain::Yahtzee => {
             println!("Yahtzee");
             let mut simulator = YahtzeeSimulator::new();
-            let mut current_state = simulator.initial_state();
+            let mut current_state = simulator.generate_initial_state();
             loop {
                 println!("{}", current_state);
-                let action = io_agent.select_action(0, &current_state, &simulator);
+                let action = io_agent.select_action(0, &current_state, &mut simulator);
                 match action {
                     Some(action) => {
                         let mut selected_actions: HashMap<usize, YahtzeeAction> = HashMap::new();

@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use crate::core::simulator::State;
 
-use super::{yahtzee_score_category::YahtzeeScoreCategory, yahtzee_constants::{N_VALUES, N_DICE}};
+use super::{yahtzee_score_category::YahtzeeScoreCategory, constants::{N_VALUES, N_DICE}};
 
 #[derive(Clone, Hash, PartialEq, Eq)]
 pub struct YahtzeeState {

@@ -24,7 +24,7 @@ pub trait Agent {
     /// The selected action from the current state
     /// or None, if the agent had no legal actions to choose.
     // fn select_action(&self, player_id: usize, state: &Box<dyn State>, simulator: &dyn Simulator) -> Option<Box<dyn Action>>;
-    fn select_action<S : State, A : Action, I: Simulator<S, A>>(&mut self, player_id: usize, state: &S, simulator: &I) -> Option<A>;
+    fn select_action<S : State, A : Action, I: Simulator<S, A>>(&mut self, player_id: usize, state: &S, simulator: &mut I) -> Option<A>;
 }
 
 pub struct IoAgent {}
@@ -36,7 +36,7 @@ impl IoAgent {
 }
 
 impl Agent for IoAgent {
-    fn select_action<S : State, A : Action, I: Simulator<S, A>>(&mut self, player_id: usize, state: &S, simulator: &I) -> Option<A> {
+    fn select_action<S : State, A : Action, I: Simulator<S, A>>(&mut self, player_id: usize, state: &S, simulator: &mut I) -> Option<A> {
         let mut input = String::new();
 
         loop {
@@ -76,7 +76,7 @@ impl RandomAgent {
 }
 
 impl Agent for RandomAgent {
-    fn select_action<S : State, A : Action, I: Simulator<S, A>>(&mut self, player_id: usize, state: &S, simulator: &I) -> Option<A> {
+    fn select_action<S : State, A : Action, I: Simulator<S, A>>(&mut self, player_id: usize, state: &S, simulator: &mut I) -> Option<A> {
         let legal_actions = simulator.calculate_legal_actions(state);
         let player_actions_result = legal_actions.get(player_id);
         return match player_actions_result {

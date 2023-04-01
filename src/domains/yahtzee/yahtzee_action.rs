@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::core::simulator::Action;
 
-use super::{yahtzee_constants::N_VALUES, yahtzee_score_category::YahtzeeScoreCategory};
+use super::{constants::N_VALUES, yahtzee_score_category::YahtzeeScoreCategory};
 
 #[derive(Clone, Hash, PartialEq, Eq)]
 pub enum YahtzeeAction {

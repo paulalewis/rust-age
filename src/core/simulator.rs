@@ -33,7 +33,7 @@ impl <A : Action> fmt::Display for LegalActions<A> {
         writeln!(f, "[")?;
         self.0.iter().fold(Ok(()), |result, action| {
             result.and_then(|_| writeln!(f, "{}", action))
-        });
+        })?;
         write!(f, "]")
     }
 }
@@ -41,16 +41,6 @@ impl <A : Action> fmt::Display for LegalActions<A> {
 /// A simulator controls the state transitions of a given domain
 /// and is associated with a domain specific state and action type.
 pub trait Simulator<S : State, A : Action> : Clone {
-    /// Generates an initial state for the domain.
-    /// 
-    /// The initial state returned is not necessarily always
-    /// the same state.
-    /// 
-    /// ### Return Value
-    /// 
-    /// Returns an inital state in the domain.
-    fn initial_state(&self) -> S;
-
     /// This is the rewards function for the given domain.
     /// 
     /// ### Arguments
@@ -65,7 +55,7 @@ pub trait Simulator<S : State, A : Action> : Clone {
 
     /// @param state the state from which to calculate rewards
     /// @return list of legal actions for each player
-    fn calculate_legal_actions(&self, state: &S) -> Vec<LegalActions<A>>;
+    fn calculate_legal_actions(&mut self, state: &S) -> Vec<LegalActions<A>>;
 
     /// Transition from the current state to the next state
     /// given a set of player actions.
@@ -79,7 +69,7 @@ pub trait Simulator<S : State, A : Action> : Clone {
     /// the current state, e.g. a multiplayer
     /// game where one player is eliminated but
     /// play continues.
-    fn number_of_players(&self, state: &S) -> usize {
+    fn number_of_players(&mut self, state: &S) -> usize {
         return self.calculate_legal_actions(state).len();
     }
 
@@ -93,7 +83,7 @@ pub trait Simulator<S : State, A : Action> : Clone {
     /// ### Returns
     /// 
     /// True if no player has any legal actions from the given state.
-    fn is_terminal_state(&self, state: &S) -> bool {
+    fn is_terminal_state(&mut self, state: &S) -> bool {
         let legal_actions = self.calculate_legal_actions(state);
         let result = legal_actions.iter().find(|a| a.0.is_empty());
         return match result {

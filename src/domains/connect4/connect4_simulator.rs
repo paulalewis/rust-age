@@ -1,3 +1,4 @@
+use crate::core::initial_state_generator::InitialStateGenerator;
 use crate::core::reward::{Reward, get_adversarial_draw, get_adversarial_p1_win, get_adversarial_p1_loss, AdversarialReward};
 use crate::core::simulator::{Simulator, LegalActions};
 
@@ -16,9 +17,9 @@ const ABOVE_TOP_ROW: u64 = BOTTOM_ROW << BOARD_HEIGHT;
 #[derive(Clone)]
 pub struct Connect4Simulator {
     action_pool: [Connect4Action; BOARD_WIDTH],
-    column_heights_cache: Option<[u8; BOARD_WIDTH]>,
+    column_heights_cache: HashMap<Connect4State, [u8; BOARD_WIDTH]>,
     rewards_cache: HashMap<Connect4State, Vec<Reward>>,
-    legal_actions_cache: Option<Vec<LegalActions<Connect4Action>>>,
+    legal_actions_cache: HashMap<Connect4State, Vec<LegalActions<Connect4Action>>>,
 }
 
 impl Connect4Simulator {
@@ -33,18 +34,14 @@ impl Connect4Simulator {
                 Connect4Action { location: 5 },
                 Connect4Action { location: 6 },
             ],
-            column_heights_cache: None,
+            column_heights_cache: HashMap::new(),
             rewards_cache: HashMap::new(),
-            legal_actions_cache: None,
+            legal_actions_cache: HashMap::new(),
         }
     }
 }
 
 impl Simulator<Connect4State, Connect4Action> for Connect4Simulator {
-
-    fn initial_state(&self) -> Connect4State {
-        Connect4State { bit_board_1: 0, bit_board_2: 0 }
-    }
 
     fn calculate_rewards(&mut self, state: &Connect4State) -> Vec<Reward> {
         let cache = self.rewards_cache.get(state);
@@ -52,16 +49,30 @@ impl Simulator<Connect4State, Connect4Action> for Connect4Simulator {
             Some(rewards) => rewards.clone(),
             None => calculate_rewards(state)
         };
+        self.rewards_cache.clear();
         self.rewards_cache.insert(state.clone(), rewards.clone());
         return rewards
     }
 
-    fn calculate_legal_actions(&self, state: &Connect4State) -> Vec<LegalActions<Connect4Action>> {
-        todo!()
+    fn calculate_legal_actions(&mut self, state: &Connect4State) -> Vec<LegalActions<Connect4Action>> {
+        let legal_actions = match self.legal_actions_cache.get(state) {
+            Some(legal_actions) => legal_actions.clone(),
+            None => calculate_legal_actions(state, &calculate_rewards(state), calculate_column_heights(state)),
+        };
+        self.legal_actions_cache.clear();
+        self.legal_actions_cache.insert(state.clone(), legal_actions.clone());
+        return legal_actions;
     }
 
     fn state_transition(&mut self, state: &Connect4State, actions: &HashMap<usize, Connect4Action>) -> Connect4State {
         todo!()
+    }
+}
+
+impl InitialStateGenerator for Connect4Simulator {
+    type S = Connect4State;
+    fn generate_initial_state(&self) -> Self::S {
+        Connect4State { bit_board_1: 0, bit_board_2: 0 }
     }
 }
 

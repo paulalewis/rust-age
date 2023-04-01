@@ -3,9 +3,9 @@ use std::collections::HashSet;
 use rand::{SeedableRng, RngCore};
 use rand_chacha::ChaCha8Rng;
 
-use crate::core::{simulator::{Simulator, LegalActions}, reward::Reward};
+use crate::core::{simulator::{Simulator, LegalActions}, reward::Reward, initial_state_generator::InitialStateGenerator};
 
-use super::{yahtzee_state::YahtzeeState, yahtzee_action::YahtzeeAction, yahtzee_score_category::YahtzeeScoreCategory, yahtzee_constants::{N_VALUES, N_DICE}};
+use super::{yahtzee_state::YahtzeeState, yahtzee_action::YahtzeeAction, yahtzee_score_category::YahtzeeScoreCategory, constants::{N_VALUES, N_DICE}};
 
 const BONUS_THRESHOLD: u16 = 63;
 const BONUS_SCORE: u16 = 35;
@@ -38,14 +38,6 @@ fn roll_dice(rng: &mut ChaCha8Rng) -> [u8; N_VALUES] {
 }
 
 impl Simulator<YahtzeeState, YahtzeeAction> for YahtzeeSimulator {
-    fn initial_state(&self) -> YahtzeeState {
-        let rng = &mut ChaCha8Rng::from_entropy();
-        YahtzeeState {
-            dice_values: roll_dice(rng),
-            roll_number: 1,
-            scores: [None; YahtzeeScoreCategory::variant_count()],
-        }
-    }
 
     fn calculate_rewards(&mut self, state: &YahtzeeState) -> Vec<Reward> {
         let mut score = 0u16;
@@ -64,7 +56,7 @@ impl Simulator<YahtzeeState, YahtzeeAction> for YahtzeeSimulator {
         return vec![Reward::Score(score as isize)];
     }
 
-    fn calculate_legal_actions(&self, state: &YahtzeeState) -> Vec<LegalActions<YahtzeeAction>> {
+    fn calculate_legal_actions(&mut self, state: &YahtzeeState) -> Vec<LegalActions<YahtzeeAction>> {
         let mut legal_actions: LegalActions<YahtzeeAction> = LegalActions(HashSet::new());
         if state.has_categories_left() {
             if state.roll_number < 3 {
@@ -149,6 +141,19 @@ impl Simulator<YahtzeeState, YahtzeeAction> for YahtzeeSimulator {
             }
         }
         return YahtzeeState { dice_values: dice_values, roll_number: rolls, scores: scores };
+    }
+}
+
+impl InitialStateGenerator for YahtzeeSimulator {
+    type S = YahtzeeState;
+    
+    fn generate_initial_state(&self) -> YahtzeeState {
+        let rng = &mut ChaCha8Rng::from_entropy();
+        YahtzeeState {
+            dice_values: roll_dice(rng),
+            roll_number: 1,
+            scores: [None; YahtzeeScoreCategory::variant_count()],
+        }
     }
 }
 
