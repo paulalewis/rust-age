@@ -1,4 +1,4 @@
-use crate::simulator::{Simulator, LegalActions};
+use crate::core::simulator::{Simulator, LegalActions};
 
 use super::connect4_constants::{BOARD_WIDTH, BOARD_HEIGHT};
 use super::connect4_state::Connect4State;

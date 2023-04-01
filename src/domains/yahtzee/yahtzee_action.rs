@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::simulator::Action;
+use crate::core::simulator::Action;
 
 use super::{yahtzee_constants::N_VALUES, yahtzee_score_category::YahtzeeScoreCategory};
 

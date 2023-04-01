@@ -1,26 +1,17 @@
-mod agent;
+mod core;
 mod domain;
-mod simulator;
 mod domains;
-mod player;
 
-use agent::Agent;
+use crate::core::agent::Agent;
+use crate::core::simulator::Simulator;
 use domain::Domain;
-use simulator::Action;
-use simulator::State;
 
-use crate::agent::RandomAgent;
-use crate::agent::IoAgent;
+use crate::core::agent::RandomAgent;
+use crate::core::agent::IoAgent;
 use crate::domains::connect4::connect4_action::Connect4Action;
 use crate::domains::connect4::connect4_simulator::Connect4Simulator;
 use crate::domains::yahtzee::yahtzee_action::YahtzeeAction;
-use crate::domains::yahtzee::yahtzee_score_category::YahtzeeScoreCategory;
-use crate::domains::yahtzee::yahtzee_action::YahtzeeAction::{YahtzeeRollAction, YahtzeeSelectAction};
 use crate::domains::yahtzee::yahtzee_simulator::YahtzeeSimulator;
-use crate::player::HumanPlayer;
-use crate::player::Player;
-use crate::player::RandomPlayer;
-use crate::simulator::Simulator;
 
 use std::collections::HashMap;
 use std::io;
@@ -33,23 +24,34 @@ fn main() {
     match domain {
         Domain::Connect4 => {
             println!("Connect 4");
-            let simulator = Connect4Simulator::new();
+            let mut simulator = Connect4Simulator::new();
             let mut current_state = simulator.initial_state();
-            let human_player = HumanPlayer::new(0, io_agent);
-            let random_player = RandomPlayer::new(1, random_agent);
+            loop {
+                println!("{}", current_state);
+                let action = io_agent.select_action(0, &current_state, &simulator);
+                match action {
+                    Some(action) => {
+                        let mut selected_actions: HashMap<usize, Connect4Action> = HashMap::new();
+                        selected_actions.insert(0, action);
+                        current_state = simulator.state_transition(&current_state, &selected_actions);
+                    }
+                    None => {
+                        println!("Invalid action");
+                    }
+                }
+            }
         }
         Domain::Yahtzee => {
             println!("Yahtzee");
             let mut simulator = YahtzeeSimulator::new();
             let mut current_state = simulator.initial_state();
-            // let human_player = HumanPlayer::new(0, io_agent);
             loop {
                 println!("{}", current_state);
                 let action = io_agent.select_action(0, &current_state, &simulator);
                 match action {
-                    Some(yahtzeeAction) => {
+                    Some(action) => {
                         let mut selected_actions: HashMap<usize, YahtzeeAction> = HashMap::new();
-                        selected_actions.insert(0, yahtzeeAction);
+                        selected_actions.insert(0, action);
                         current_state = simulator.state_transition(&current_state, &selected_actions);
                     }
                     None => {

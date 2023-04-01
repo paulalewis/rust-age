@@ -13,7 +13,7 @@ pub struct LegalActions<A : Action>(pub HashSet<A>);
 
 impl <A : Action> fmt::Display for LegalActions<A> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        writeln!(f, "[");
+        writeln!(f, "[")?;
         self.0.iter().fold(Ok(()), |result, action| {
             result.and_then(|_| writeln!(f, "{}", action))
         });

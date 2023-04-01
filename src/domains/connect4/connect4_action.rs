@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::simulator::Action;
+use crate::core::simulator::Action;
 
 /// Represents a slot location to place piece.
 #[derive(Clone, Hash, PartialEq, Eq)]

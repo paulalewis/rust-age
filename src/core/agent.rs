@@ -1,10 +1,11 @@
-use crate::simulator::Action;
-use crate::simulator::Simulator;
-use crate::simulator::State;
 use rand::Rng;
 use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
 use std::io;
+
+use super::simulator::Action;
+use super::simulator::Simulator;
+use super::simulator::State;
 
 /// An agent interacts in a domain by selecting
 /// an action from a list of legal actions for

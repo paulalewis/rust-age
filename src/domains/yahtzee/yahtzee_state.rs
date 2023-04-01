@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::simulator::State;
+use crate::core::simulator::State;
 
 use super::{yahtzee_score_category::YahtzeeScoreCategory, yahtzee_constants::{N_VALUES, N_DICE}};
 

@@ -1,6 +1,8 @@
 use std::fmt::{Display, self};
 
-use crate::{simulator::State, domains::connect4::connect4_constants::{BOARD_HEIGHT, BOARD_WIDTH}};
+use crate::core::simulator::State;
+
+use super::connect4_constants::{BOARD_HEIGHT, BOARD_WIDTH};
 
 /// Connect 4 board state.
 /// 
