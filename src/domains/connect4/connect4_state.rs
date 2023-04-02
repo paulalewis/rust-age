@@ -16,13 +16,12 @@ use super::connect4_constants::{BOARD_HEIGHT, BOARD_WIDTH};
 /// 0  7 14 21 28 35 42
 #[derive(Clone, fmt::Debug, Hash, PartialEq, Eq)]
 pub struct Connect4State {
-    pub bit_board_1: u64,
-    pub bit_board_2: u64,
+    pub bit_board: [u64; 2],
 }
 
 impl Connect4State {
     pub fn player_1_turn(&self) -> bool {
-        return Connect4State::count_ones(self.bit_board_1) <= Connect4State::count_ones(self.bit_board_2);
+        return Connect4State::count_ones(self.bit_board[0]) <= Connect4State::count_ones(self.bit_board[1]);
     }
 
     fn count_ones(value: u64) -> u8 {
@@ -54,9 +53,9 @@ impl Display for Connect4State {
             let mut j = i;
             while j < (BOARD_HEIGHT + 1) * BOARD_WIDTH {
                 let mask = 1 << j;
-                if (self.bit_board_1 & mask) != 0 {
+                if (self.bit_board[0] & mask) != 0 {
                     write!(f, "X")?;
-                } else if (self.bit_board_2 & mask) != 0 {
+                } else if (self.bit_board[1] & mask) != 0 {
                     write!(f, "O")?;
                 } else {
                     write!(f, "-")?;

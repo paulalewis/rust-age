@@ -52,7 +52,7 @@ impl Connect4Simulator {
 impl Simulator<Connect4State, Connect4Action, AdversarialReward> for Connect4Simulator {
     
     fn generate_initial_state(&mut self) -> Connect4State {
-        Connect4State { bit_board_1: 0, bit_board_2: 0 }
+        Connect4State { bit_board: [0, 0] }
     }
 
     fn calculate_rewards(&mut self, state: &Connect4State) -> Vec<AdversarialReward> {
@@ -86,11 +86,7 @@ impl Simulator<Connect4State, Connect4Action, AdversarialReward> for Connect4Sim
             panic!("Illegal action, {action}, from state, {state}");
         }
         column_heights[action.location as usize] += 1;
-        if state.player_1_turn() {
-            state.bit_board_1 = state.bit_board_1 ^ (1 << column_heights[action.location as usize]);
-        } else {
-            state.bit_board_2 = state.bit_board_2 ^ (1 << column_heights[action.location as usize]);
-        }
+        state.bit_board[agent_turn] = state.bit_board[agent_turn] ^ (1 << column_heights[action.location as usize]);
         return state;
     }
 }
@@ -113,7 +109,7 @@ fn calculate_legal_actions(
 fn calculate_rewards(state: &Connect4State) -> Vec<AdversarialReward> {
     let height = BOARD_HEIGHT;
     for i in 0..N_PLAYERS {
-        let bit_board = if i == 0 { state.bit_board_1 } else { state.bit_board_2 };
+        let bit_board = state.bit_board[1];
         let diagonal1 = bit_board & (bit_board >> height);
         let horizontal = bit_board & (bit_board >> height + 1);
         let diagonal2 = bit_board & (bit_board >> height + 2);
@@ -130,7 +126,7 @@ fn calculate_rewards(state: &Connect4State) -> Vec<AdversarialReward> {
 
 fn calculate_column_heights(state: &Connect4State) -> [u8; BOARD_WIDTH] {
     let mut column_heights = [0u8; BOARD_WIDTH];
-    let bit_board = state.bit_board_1 | state.bit_board_2;
+    let bit_board = state.bit_board[0] | state.bit_board[1];
     for i in 0..BOARD_WIDTH {
         column_heights[i] = ((BOARD_HEIGHT + 1) * i) as u8;
         while bit_board & (1 << column_heights[i]) != 0 {
