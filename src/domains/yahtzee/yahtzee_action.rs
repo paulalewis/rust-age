@@ -20,7 +20,11 @@ impl fmt::Display for YahtzeeAction {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             YahtzeeAction::SelectDice { selected } => {
-                write!(f, "{:?}", selected)
+                write!(f, "[")?;
+                selected.iter().fold(Ok(()), |result, die_value| {
+                    result.and_then(|_| write!(f, " {}", die_value))
+                })?;
+                write!(f, " ]")
             }
             YahtzeeAction::SelectCategory { score_category } => {
                 write!(f, "{:?}", score_category)
@@ -36,7 +40,7 @@ mod tests {
     #[test]
     fn yahtzee_action_select_dice_to_string() {
         let action = YahtzeeAction::SelectDice { selected: [0; N_VALUES] };
-        assert_eq!(action.to_string(), "[0, 0, 0, 0, 0, 0]");
+        assert_eq!(action.to_string(), "[ 0 0 0 0 0 0 ]");
     }
 
     #[test]

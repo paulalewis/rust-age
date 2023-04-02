@@ -14,7 +14,7 @@ use std::io;
 
 fn main() {
     let domain = select_domain();
-    let random_agent = RandomAgent::new();
+    let mut random_agent = RandomAgent::new();
     let mut io_agent = IoAgent::new();
 
     match domain {
@@ -72,14 +72,16 @@ fn select_domain() -> Domain {
 
 fn select_seed() -> u64 {
     let mut input = String::new();
-    println!("Select a seed:");
+    println!("Select a seed (u64 value):");
     loop {
         io::stdin().read_line(&mut input).unwrap();
         match input.trim().parse::<u64>() {
             Ok(seed) => break seed,
             Err(_) => {
                 println!("Invalid input: {}", input);
-                input.clear();
+                let seed = rand::random::<u64>();
+                println!("Selecting a random seed = {seed}");
+                break seed;
             },
         }
     }
