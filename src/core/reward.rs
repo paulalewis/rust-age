@@ -1,11 +1,11 @@
 pub trait Reward : Clone + PartialEq + PartialOrd {}
 
-#[derive(Clone, PartialEq, PartialOrd)]
+#[derive(Clone, Debug, PartialEq, PartialOrd)]
 pub struct ScoreReward(pub isize);
 
 impl Reward for ScoreReward {}
 
-#[derive(Clone, PartialEq, PartialOrd)]
+#[derive(Clone, Debug, PartialEq, PartialOrd)]
 pub enum AdversarialReward {
     Win = 1,
     Loss = -1,
@@ -14,14 +14,21 @@ pub enum AdversarialReward {
 
 impl Reward for AdversarialReward {}
 
-pub fn get_adversarial_draw() -> Vec<AdversarialReward> {
-    vec![AdversarialReward::Draw, AdversarialReward::Draw]
-}
+pub const ADVERSARIAL_DRAW: [AdversarialReward; 2] = [AdversarialReward::Draw, AdversarialReward::Draw];
+pub const ADVERSARIAL_P1_WIN: [AdversarialReward; 2] = [AdversarialReward::Win, AdversarialReward::Loss];
+pub const ADVERSARIAL_P1_LOSS: [AdversarialReward; 2] = [AdversarialReward::Loss, AdversarialReward::Win];
 
-pub fn get_adversarial_p1_win() -> Vec<AdversarialReward> {
-    vec![AdversarialReward::Win, AdversarialReward::Loss]
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-pub fn get_adversarial_p1_loss () -> Vec<AdversarialReward> {
-    vec![AdversarialReward::Loss, AdversarialReward::Win]
+    #[test]
+    fn reward_adversarial_reward_is_ordered_win_draw_loss() {
+        let win = AdversarialReward::Win;
+        let draw = AdversarialReward::Draw;
+        let loss = AdversarialReward::Loss;
+        assert!(win > draw);
+        assert!(draw > loss);
+        assert!(win > loss);
+    }
 }

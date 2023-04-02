@@ -1,4 +1,4 @@
-use crate::core::reward::{get_adversarial_draw, get_adversarial_p1_win, get_adversarial_p1_loss, AdversarialReward};
+use crate::core::reward::{AdversarialReward, ADVERSARIAL_P1_WIN, ADVERSARIAL_P1_LOSS, ADVERSARIAL_DRAW};
 use crate::core::simulator::{Simulator, LegalActions};
 
 use super::connect4_constants::{BOARD_WIDTH, BOARD_HEIGHT};
@@ -122,10 +122,10 @@ fn calculate_rewards(state: &Connect4State) -> Vec<AdversarialReward> {
             (horizontal & (horizontal >> 2 * (height + 1))) | 
             (diagonal2 & (diagonal2 >> 2 * (height + 2))) |
             (vertical & (vertical >> 2)) != 0 {
-            return if i == 0 { get_adversarial_p1_win() } else { get_adversarial_p1_loss() };
+            return if i == 0 { ADVERSARIAL_P1_WIN.to_vec() } else { ADVERSARIAL_P1_LOSS.to_vec() };
         }
     }
-    return get_adversarial_draw();
+    return ADVERSARIAL_DRAW.to_vec();
 }
 
 fn calculate_column_heights(state: &Connect4State) -> [u8; BOARD_WIDTH] {
