@@ -74,15 +74,7 @@ pub struct RandomAgent {
 
 impl RandomAgent {
     pub fn new() -> Self {
-        RandomAgent {
-            rng: ChaCha8Rng::from_entropy(),
-        }
-    }
-    
-    pub fn with_seed(seed: u64) -> Self {
-        RandomAgent {
-            rng: ChaCha8Rng::seed_from_u64(seed),
-        }
+        RandomAgent { rng: ChaCha8Rng::from_entropy() }
     }
 }
 
