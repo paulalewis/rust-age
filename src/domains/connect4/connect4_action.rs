@@ -15,3 +15,14 @@ impl fmt::Display for Connect4Action {
         write!(f, "({})", self.location + 1)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn connect4_action_to_string() {
+        let action = Connect4Action { location: 0 };
+        assert_eq!(action.to_string(), "(1)");
+    }
+}
