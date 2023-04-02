@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use rand::{SeedableRng, RngCore};
 use rand_chacha::ChaCha8Rng;
 
-use crate::core::{simulator::{Simulator, LegalActions}, reward::Reward, initial_state_generator::InitialStateGenerator};
+use crate::core::{simulator::{Simulator, LegalActions}, reward::{ScoreReward}, initial_state_generator::InitialStateGenerator};
 
 use super::{yahtzee_state::YahtzeeState, yahtzee_action::YahtzeeAction, yahtzee_score_category::YahtzeeScoreCategory, constants::{N_VALUES, N_DICE}};
 
@@ -37,9 +37,9 @@ fn roll_dice(rng: &mut ChaCha8Rng) -> [u8; N_VALUES] {
     dice_values
 }
 
-impl Simulator<YahtzeeState, YahtzeeAction> for YahtzeeSimulator {
+impl Simulator<YahtzeeState, YahtzeeAction, ScoreReward> for YahtzeeSimulator {
 
-    fn calculate_rewards(&mut self, state: &YahtzeeState) -> Vec<Reward> {
+    fn calculate_rewards(&mut self, state: &YahtzeeState) -> Vec<ScoreReward> {
         let mut score = 0u16;
         if !state.has_categories_left() {
             let scores = state.scores.iter().map(|&x| x.unwrap_or(0) as u16).collect::<Vec<u16>>();
@@ -53,7 +53,7 @@ impl Simulator<YahtzeeState, YahtzeeAction> for YahtzeeSimulator {
                 score += scores[i];
             }
         }
-        return vec![Reward::Score(score as isize)];
+        return vec![ScoreReward(score as isize)];
     }
 
     fn calculate_legal_actions(&mut self, state: &YahtzeeState) -> Vec<LegalActions<YahtzeeAction>> {

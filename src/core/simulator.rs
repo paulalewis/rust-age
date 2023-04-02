@@ -40,7 +40,7 @@ impl <A : Action> fmt::Display for LegalActions<A> {
 
 /// A simulator controls the state transitions of a given domain
 /// and is associated with a domain specific state and action type.
-pub trait Simulator<S : State, A : Action> : Clone {
+pub trait Simulator<S : State, A : Action, R : Reward> : Clone {
     /// This is the rewards function for the given domain.
     /// 
     /// ### Arguments
@@ -51,7 +51,7 @@ pub trait Simulator<S : State, A : Action> : Clone {
     /// 
     /// Returns a reward value for each player that can be
     /// indexed by the player ID.
-    fn calculate_rewards(&mut self, state: &S) -> Vec<Reward>;
+    fn calculate_rewards(&mut self, state: &S) -> Vec<R>;
 
     /// @param state the state from which to calculate rewards
     /// @return list of legal actions for each player
