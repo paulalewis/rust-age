@@ -71,7 +71,7 @@ impl <'a> Simulator<YahtzeeState, YahtzeeAction, ScoreReward> for YahtzeeSimulat
                             for l in 0..=state.dice_values[3] {
                                 for m in 0..=state.dice_values[4] {
                                     for n in 0..=state.dice_values[5] {
-                                        legal_actions.0.insert(YahtzeeAction::YahtzeeRollAction { selected: [i, j, k, l, m, n] });
+                                        legal_actions.0.insert(YahtzeeAction::SelectDice { selected: [i, j, k, l, m, n] });
                                     }
                                 }
                             }
@@ -83,11 +83,11 @@ impl <'a> Simulator<YahtzeeState, YahtzeeAction, ScoreReward> for YahtzeeSimulat
                 if yahtzee == None || state.scores[yahtzee.unwrap()] != None {
                     (0..YahtzeeScoreCategory::variant_count())
                         .filter(|&x| state.scores[x] == None)
-                        .for_each(|x| { legal_actions.0.insert(YahtzeeAction::YahtzeeSelectAction { score_category: YahtzeeScoreCategory::from_ordinal(x as i8).unwrap() }); } );
+                        .for_each(|x| { legal_actions.0.insert(YahtzeeAction::SelectCategory { score_category: YahtzeeScoreCategory::from_ordinal(x as i8).unwrap() }); } );
                 } else {
-                    legal_actions.0.insert(YahtzeeAction::YahtzeeSelectAction { score_category: YahtzeeScoreCategory::from_ordinal(yahtzee.unwrap() as i8).unwrap() });
+                    legal_actions.0.insert(YahtzeeAction::SelectCategory { score_category: YahtzeeScoreCategory::from_ordinal(yahtzee.unwrap() as i8).unwrap() });
                     if state.scores[YahtzeeScoreCategory::Yahtzee.ordinal() as usize] == None {
-                        legal_actions.0.insert(YahtzeeAction::YahtzeeSelectAction { score_category: YahtzeeScoreCategory::Yahtzee });
+                        legal_actions.0.insert(YahtzeeAction::SelectCategory { score_category: YahtzeeScoreCategory::Yahtzee });
                     }
                 }
             }
@@ -114,7 +114,7 @@ impl <'a> Simulator<YahtzeeState, YahtzeeAction, ScoreReward> for YahtzeeSimulat
         }
 
         match action {
-            YahtzeeAction::YahtzeeRollAction { selected } => {
+            YahtzeeAction::SelectDice { selected } => {
                 dice_values = *selected;
                 let num_selected = dice_values.iter().sum::<u8>() as usize;
                 for _ in num_selected..N_DICE {
@@ -123,7 +123,7 @@ impl <'a> Simulator<YahtzeeState, YahtzeeAction, ScoreReward> for YahtzeeSimulat
                 }
                 rolls += 1;
             },
-            YahtzeeAction::YahtzeeSelectAction { score_category } => {
+            YahtzeeAction::SelectCategory { score_category } => {
                 let score = match score_category {
                     YahtzeeScoreCategory::Ones => score_ones(&dice_values),
                     YahtzeeScoreCategory::Twos => score_twos(&dice_values),
