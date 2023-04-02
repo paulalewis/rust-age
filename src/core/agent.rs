@@ -32,6 +32,7 @@ pub trait Agent {
         I: Simulator<S, A, R>;
 }
 
+/// An IoAgent selects an action by prompting the user.
 pub struct IoAgent {}
 
 impl IoAgent {

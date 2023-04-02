@@ -41,6 +41,16 @@ impl <A : Action> fmt::Display for LegalActions<A> {
 /// A simulator controls the state transitions of a given domain
 /// and is associated with a domain specific state and action type.
 pub trait Simulator<S : State, A : Action, R : Reward> {
+    /// Generates an initial state for the domain.
+    /// 
+    /// The initial state returned is not necessarily always
+    /// the same state.
+    /// 
+    /// ### Return Value
+    /// 
+    /// Returns an inital state in the domain.
+    fn generate_initial_state(&mut self) -> S;
+
     /// This is the rewards function for the given domain.
     /// 
     /// ### Arguments

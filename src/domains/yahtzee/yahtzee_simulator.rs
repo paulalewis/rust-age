@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use rand::{SeedableRng, RngCore};
 use rand_chacha::ChaCha8Rng;
 
-use crate::core::{simulator::{Simulator, LegalActions}, reward::{ScoreReward}, initial_state_generator::InitialStateGenerator};
+use crate::core::{simulator::{Simulator, LegalActions}, reward::{ScoreReward}};
 
 use super::{yahtzee_state::YahtzeeState, yahtzee_action::YahtzeeAction, yahtzee_score_category::YahtzeeScoreCategory, constants::{N_VALUES, N_DICE}};
 
@@ -35,6 +35,14 @@ fn roll_dice(rng: &mut ChaCha8Rng) -> [u8; N_VALUES] {
 }
 
 impl <'a> Simulator<YahtzeeState, YahtzeeAction, ScoreReward> for YahtzeeSimulator<'a> {
+    
+    fn generate_initial_state(&mut self) -> YahtzeeState {
+        YahtzeeState {
+            dice_values: roll_dice(self.rng),
+            roll_number: 1,
+            scores: [None; YahtzeeScoreCategory::variant_count()],
+        }
+    }
 
     fn calculate_rewards(&mut self, state: &YahtzeeState) -> Vec<ScoreReward> {
         let mut score = 0u16;
@@ -138,19 +146,6 @@ impl <'a> Simulator<YahtzeeState, YahtzeeAction, ScoreReward> for YahtzeeSimulat
             }
         }
         return YahtzeeState { dice_values: dice_values, roll_number: rolls, scores: scores };
-    }
-}
-
-impl <'a> InitialStateGenerator for YahtzeeSimulator<'a> {
-    type S = YahtzeeState;
-    
-    fn generate_initial_state(&self) -> YahtzeeState {
-        let rng = &mut ChaCha8Rng::from_entropy();
-        YahtzeeState {
-            dice_values: roll_dice(rng),
-            roll_number: 1,
-            scores: [None; YahtzeeScoreCategory::variant_count()],
-        }
     }
 }
 

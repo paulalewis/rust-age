@@ -1,5 +1,4 @@
 use abstract_game_engine::core::agent::Agent;
-use abstract_game_engine::core::initial_state_generator::InitialStateGenerator;
 use abstract_game_engine::core::simulator::Simulator;
 use abstract_game_engine::core::agent::RandomAgent;
 use abstract_game_engine::core::agent::IoAgent;
@@ -33,7 +32,8 @@ fn main() {
         }
         Domain::Yahtzee => {
             println!("Yahtzee");
-            let mut rng = ChaCha8Rng::seed_from_u64(17);
+            let seed = select_seed();
+            let mut rng = ChaCha8Rng::seed_from_u64(seed);
             let mut simulator = YahtzeeSimulator::new(&mut rng);
             let mut current_state = simulator.generate_initial_state();
             loop {
@@ -63,6 +63,21 @@ fn select_domain() -> Domain {
             "1" => break Domain::Connect4,
             "2" => break Domain::Yahtzee,
             _ => {
+                println!("Invalid input: {}", input);
+                input.clear();
+            },
+        }
+    }
+}
+
+fn select_seed() -> u64 {
+    let mut input = String::new();
+    println!("Select a seed:");
+    loop {
+        io::stdin().read_line(&mut input).unwrap();
+        match input.trim().parse::<u64>() {
+            Ok(seed) => break seed,
+            Err(_) => {
                 println!("Invalid input: {}", input);
                 input.clear();
             },

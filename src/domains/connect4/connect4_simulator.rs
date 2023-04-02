@@ -1,4 +1,3 @@
-use crate::core::initial_state_generator::InitialStateGenerator;
 use crate::core::reward::{get_adversarial_draw, get_adversarial_p1_win, get_adversarial_p1_loss, AdversarialReward};
 use crate::core::simulator::{Simulator, LegalActions};
 
@@ -51,6 +50,10 @@ impl Connect4Simulator {
 }
 
 impl Simulator<Connect4State, Connect4Action, AdversarialReward> for Connect4Simulator {
+    
+    fn generate_initial_state(&mut self) -> Connect4State {
+        Connect4State { bit_board_1: 0, bit_board_2: 0 }
+    }
 
     fn calculate_rewards(&mut self, state: &Connect4State) -> Vec<AdversarialReward> {
         let cache = self.rewards_cache.get(state);
@@ -89,13 +92,6 @@ impl Simulator<Connect4State, Connect4Action, AdversarialReward> for Connect4Sim
             state.bit_board_2 = state.bit_board_2 ^ (1 << column_heights[action.location as usize]);
         }
         return state;
-    }
-}
-
-impl InitialStateGenerator for Connect4Simulator {
-    type S = Connect4State;
-    fn generate_initial_state(&self) -> Self::S {
-        Connect4State { bit_board_1: 0, bit_board_2: 0 }
     }
 }
 
