@@ -14,7 +14,7 @@ use super::connect4_constants::{BOARD_HEIGHT, BOARD_WIDTH};
 /// 2  9 16 23 30 37 44
 /// 1  8 15 22 29 36 43
 /// 0  7 14 21 28 35 42
-#[derive(Clone, Hash, PartialEq, Eq)]
+#[derive(Clone, fmt::Debug, Hash, PartialEq, Eq)]
 pub struct Connect4State {
     pub bit_board_1: u64,
     pub bit_board_2: u64,

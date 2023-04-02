@@ -4,7 +4,7 @@ use crate::core::simulator::Action;
 
 use super::{constants::N_VALUES, yahtzee_score_category::YahtzeeScoreCategory};
 
-#[derive(Clone, Hash, PartialEq, Eq)]
+#[derive(Clone, fmt::Debug, Hash, PartialEq, Eq)]
 pub enum YahtzeeAction {
     /// The roll action controls which dice get
     /// rolled and which are kept for next state.

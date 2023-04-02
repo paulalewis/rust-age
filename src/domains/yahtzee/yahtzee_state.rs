@@ -1,10 +1,10 @@
-use std::fmt::Display;
+use std::fmt;
 
 use crate::core::simulator::State;
 
 use super::{yahtzee_score_category::YahtzeeScoreCategory, constants::{N_VALUES, N_DICE}};
 
-#[derive(Clone, Hash, PartialEq, Eq)]
+#[derive(Clone, fmt::Debug, Hash, PartialEq, Eq)]
 pub struct YahtzeeState {
     pub dice_values: [u8; N_VALUES],
     pub roll_number: u8,
@@ -28,7 +28,7 @@ impl State for YahtzeeState {
     }
 }
 
-impl Display for YahtzeeState {
+impl fmt::Display for YahtzeeState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{} - [ ", self.roll_number)?;
         for dice_value in self.dice_values {

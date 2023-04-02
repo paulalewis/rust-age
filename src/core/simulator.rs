@@ -6,8 +6,8 @@ use std::collections::hash_set::HashSet;
 
 use super::reward::Reward;
 
-pub trait Action : Clone + fmt::Display + Hash + Eq {}
-pub trait State : Clone + fmt::Display + Hash + Eq {
+pub trait Action : Clone + fmt::Debug + fmt::Display + Hash + Eq {}
+pub trait State : Clone + fmt::Debug + fmt::Display + Hash + Eq {
     fn get_current_player_ids(&self) -> Vec<usize>;
 }
 
