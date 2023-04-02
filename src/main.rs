@@ -24,16 +24,9 @@ fn main() {
             loop {
                 println!("{}", current_state);
                 let action = io_agent.select_action(0, &current_state, &mut simulator);
-                match action {
-                    Some(action) => {
-                        let mut selected_actions: HashMap<usize, Connect4Action> = HashMap::new();
-                        selected_actions.insert(0, action);
-                        current_state = simulator.state_transition(&current_state, &selected_actions);
-                    }
-                    None => {
-                        println!("Invalid action");
-                    }
-                }
+                let mut selected_actions: HashMap<usize, Connect4Action> = HashMap::new();
+                selected_actions.insert(0, action);
+                current_state = simulator.state_transition(&current_state, &selected_actions);
             }
         }
         Domain::Yahtzee => {
@@ -43,16 +36,9 @@ fn main() {
             loop {
                 println!("{}", current_state);
                 let action = io_agent.select_action(0, &current_state, &mut simulator);
-                match action {
-                    Some(action) => {
-                        let mut selected_actions: HashMap<usize, YahtzeeAction> = HashMap::new();
-                        selected_actions.insert(0, action);
-                        current_state = simulator.state_transition(&current_state, &selected_actions);
-                    }
-                    None => {
-                        println!("Invalid action");
-                    }
-                }
+                let mut selected_actions: HashMap<usize, YahtzeeAction> = HashMap::new();
+                selected_actions.insert(0, action);
+                current_state = simulator.state_transition(&current_state, &selected_actions);
             }
         }
     };

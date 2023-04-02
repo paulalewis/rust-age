@@ -13,6 +13,8 @@ use super::simulator::State;
 pub trait Agent {
     /// Selects an action for a given player.
     /// 
+    /// Will panic if the player has no legal actions.
+    /// 
     /// ### Arguments
     /// 
     /// * `player_id` - The ID that indicates which player tha agent is using to select an action.
@@ -21,10 +23,8 @@ pub trait Agent {
     /// 
     /// ### Return Value
     /// 
-    /// The selected action from the current state
-    /// or None, if the agent had no legal actions to choose.
-    // fn select_action(&self, player_id: usize, state: &Box<dyn State>, simulator: &dyn Simulator) -> Option<Box<dyn Action>>;
-    fn select_action<S : State, A : Action, I: Simulator<S, A>>(&mut self, player_id: usize, state: &S, simulator: &mut I) -> Option<A>;
+    /// The selected action from the current state.
+    fn select_action<S : State, A : Action, I: Simulator<S, A>>(&mut self, player_id: usize, state: &S, simulator: &mut I) -> A;
 }
 
 pub struct IoAgent {}
@@ -36,7 +36,7 @@ impl IoAgent {
 }
 
 impl Agent for IoAgent {
-    fn select_action<S : State, A : Action, I: Simulator<S, A>>(&mut self, player_id: usize, state: &S, simulator: &mut I) -> Option<A> {
+    fn select_action<S : State, A : Action, I: Simulator<S, A>>(&mut self, player_id: usize, state: &S, simulator: &mut I) -> A {
         let mut input = String::new();
 
         loop {
@@ -47,7 +47,7 @@ impl Agent for IoAgent {
             io::stdin().read_line(&mut input).unwrap();
 
             match player_legal_actions.0.iter().find(|action| { action.to_string() == input.trim() }) {
-                Some(action) => break Some(action.clone()),
+                Some(action) => break action.clone(),
                 None => {
                     println!("Not a legal action: {}", input);
                     input.clear();
@@ -76,20 +76,9 @@ impl RandomAgent {
 }
 
 impl Agent for RandomAgent {
-    fn select_action<S : State, A : Action, I: Simulator<S, A>>(&mut self, player_id: usize, state: &S, simulator: &mut I) -> Option<A> {
-        let legal_actions = simulator.calculate_legal_actions(state);
-        let player_actions_result = legal_actions.get(player_id);
-        return match player_actions_result {
-            Some(player_actions) => {
-                return if player_actions.0.is_empty() {
-                    None
-                } else {
-                    let index = self.rng.gen_range(0..player_actions.0.len());
-                    let element = player_actions.0.iter().nth(index).unwrap();
-                    Some(element.clone())
-                }
-            }
-            None => None
-        }
+    fn select_action<S : State, A : Action, I: Simulator<S, A>>(&mut self, player_id: usize, state: &S, simulator: &mut I) -> A {
+        let player_legal_actions = &simulator.calculate_legal_actions(&state)[player_id];
+        let random_index = self.rng.gen_range(0..player_legal_actions.0.len());
+        player_legal_actions.0.iter().nth(random_index).expect("Index should always be in bounds.").clone()
     }
 }
