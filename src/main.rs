@@ -7,6 +7,8 @@ use abstract_game_engine::domains::connect4::connect4_action::Connect4Action;
 use abstract_game_engine::domains::connect4::connect4_simulator::Connect4Simulator;
 use abstract_game_engine::domains::yahtzee::yahtzee_action::YahtzeeAction;
 use abstract_game_engine::domains::yahtzee::yahtzee_simulator::YahtzeeSimulator;
+use rand::SeedableRng;
+use rand_chacha::ChaCha8Rng;
 
 use std::collections::HashMap;
 use std::io;
@@ -31,7 +33,8 @@ fn main() {
         }
         Domain::Yahtzee => {
             println!("Yahtzee");
-            let mut simulator = YahtzeeSimulator::new();
+            let mut rng = ChaCha8Rng::seed_from_u64(17);
+            let mut simulator = YahtzeeSimulator::new(&mut rng);
             let mut current_state = simulator.generate_initial_state();
             loop {
                 println!("{}", current_state);

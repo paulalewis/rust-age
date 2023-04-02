@@ -15,16 +15,13 @@ const LARGE_STRAIGHT_SCORE: u16 = 40;
 const YAHTZEE_SCORE: u16 = 50;
 const YAHTZEE_BONUS: u16 = 100;
 
-#[derive(Clone)]
-pub struct YahtzeeSimulator {
-    rng: ChaCha8Rng,
+pub struct YahtzeeSimulator<'a> {
+    rng: &'a mut ChaCha8Rng,
 }
 
-impl YahtzeeSimulator {
-    pub fn new() -> Self {
-        YahtzeeSimulator {
-            rng: ChaCha8Rng::from_entropy(),
-        }
+impl <'a> YahtzeeSimulator<'a> {
+    pub fn new(rng: &'a mut ChaCha8Rng) -> Self {
+        YahtzeeSimulator { rng }
     }
 }
  
@@ -37,7 +34,7 @@ fn roll_dice(rng: &mut ChaCha8Rng) -> [u8; N_VALUES] {
     dice_values
 }
 
-impl Simulator<YahtzeeState, YahtzeeAction, ScoreReward> for YahtzeeSimulator {
+impl <'a> Simulator<YahtzeeState, YahtzeeAction, ScoreReward> for YahtzeeSimulator<'a> {
 
     fn calculate_rewards(&mut self, state: &YahtzeeState) -> Vec<ScoreReward> {
         let mut score = 0u16;
@@ -144,7 +141,7 @@ impl Simulator<YahtzeeState, YahtzeeAction, ScoreReward> for YahtzeeSimulator {
     }
 }
 
-impl InitialStateGenerator for YahtzeeSimulator {
+impl <'a> InitialStateGenerator for YahtzeeSimulator<'a> {
     type S = YahtzeeState;
     
     fn generate_initial_state(&self) -> YahtzeeState {

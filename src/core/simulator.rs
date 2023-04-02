@@ -40,7 +40,7 @@ impl <A : Action> fmt::Display for LegalActions<A> {
 
 /// A simulator controls the state transitions of a given domain
 /// and is associated with a domain specific state and action type.
-pub trait Simulator<S : State, A : Action, R : Reward> : Clone {
+pub trait Simulator<S : State, A : Action, R : Reward> {
     /// This is the rewards function for the given domain.
     /// 
     /// ### Arguments

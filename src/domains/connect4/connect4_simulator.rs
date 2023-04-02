@@ -14,7 +14,6 @@ const FIRST_COLUMN: u64 = (1 << BOARD_HEIGHT + 1) - 1;
 const BOTTOM_ROW: u64 = ALL_LOCATIONS / FIRST_COLUMN;
 const ABOVE_TOP_ROW: u64 = BOTTOM_ROW << BOARD_HEIGHT;
 
-#[derive(Clone)]
 pub struct Connect4Simulator {
     action_pool: [Connect4Action; BOARD_WIDTH],
     column_heights_cache: HashMap<Connect4State, [u8; BOARD_WIDTH]>,
