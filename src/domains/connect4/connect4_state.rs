@@ -69,3 +69,32 @@ impl Display for Connect4State {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn connect4_state_to_string_empty_board() {
+        let state = Connect4State { bit_board: [0, 0] };
+        let expected = "-------\n\
+                              -------\n\
+                              -------\n\
+                              -------\n\
+                              -------\n\
+                              -------";
+        assert_eq!(state.to_string(), expected);
+    }
+    
+    #[test]
+    fn connect4_state_to_string() {
+        let state = Connect4State { bit_board: [0b10_0000001_0000000_0000000_0000000, 0b1_0000000_0000000_0000001_0000000] };
+        let expected = "-------\n\
+                              -------\n\
+                              -------\n\
+                              -------\n\
+                              ----X--\n\
+                              -O-XO--";
+        assert_eq!(state.to_string(), expected);
+    }
+}
