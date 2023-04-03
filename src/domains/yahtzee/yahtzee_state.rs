@@ -50,3 +50,60 @@ impl fmt::Display for YahtzeeState {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn has_categories_left_true() {
+        let state = YahtzeeState {
+            dice_values: [0; N_VALUES],
+            roll_number: 1,
+            scores: [None; YahtzeeScoreCategory::variant_count()],
+        };
+        assert!(state.has_categories_left());
+    }
+
+    #[test]
+    fn has_categories_left_false() {
+        let state = YahtzeeState {
+            dice_values: [0; N_VALUES],
+            roll_number: 1,
+            scores: [Some(0); YahtzeeScoreCategory::variant_count()],
+        };
+        assert!(!state.has_categories_left());
+    }
+
+    #[test]
+    fn check_yahtzee_none() {
+        let state = YahtzeeState {
+            dice_values: [1, 0, 1, 1, 2, 0],
+            roll_number: 1,
+            scores: [None; YahtzeeScoreCategory::variant_count()],
+        };
+        assert_eq!(state.check_yahtzee(), None);
+    }
+
+    #[test]
+    fn check_yahtzee_threes() {
+        let state = YahtzeeState {
+            dice_values: [0, 0, 5, 0, 0, 0],
+            roll_number: 1,
+            scores: [None; YahtzeeScoreCategory::variant_count()],
+        };
+        assert_eq!(state.check_yahtzee(), Some(2));
+    }
+
+    #[test]
+    fn yahtzee_state_to_string() {
+        let state = YahtzeeState {
+            dice_values: [0; N_VALUES],
+            roll_number: 1,
+            scores: [None; YahtzeeScoreCategory::variant_count()],
+        };
+        let expected = "1 - [ 0 0 0 0 0 0 ]\nOnes: -\nTwos: -\nThrees: -\nFours: -\nFives: -\nSixes: -\nThreeOfKind: -\nFourOfKind: -\nFullHouse: -\nSmallStraight: -\nLargeStraight: -\nYahtzee: -\nChance: -";
+        
+        assert_eq!(state.to_string(), expected);
+    }
+}
