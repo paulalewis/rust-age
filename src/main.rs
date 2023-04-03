@@ -2,6 +2,7 @@ use abstract_game_engine::core::agent::Agent;
 use abstract_game_engine::core::simulator::Simulator;
 use abstract_game_engine::core::agent::RandomAgent;
 use abstract_game_engine::core::agent::IoAgent;
+use abstract_game_engine::core::simulator::State;
 use abstract_game_engine::domains::connect4::connect4_action::Connect4Action;
 use abstract_game_engine::domains::connect4::connect4_simulator::Connect4Simulator;
 use abstract_game_engine::domains::yahtzee::yahtzee_action::YahtzeeAction;
@@ -24,10 +25,13 @@ fn main() {
             let mut current_state = simulator.generate_initial_state();
             loop {
                 println!("{}", current_state);
-                let action = io_agent.select_action(0, &current_state, &mut simulator);
                 let mut selected_actions: HashMap<usize, Connect4Action> = HashMap::new();
-                selected_actions.insert(0, action);
+                for player_id in current_state.get_current_player_ids() {
+                    let action = io_agent.select_action(player_id, &current_state, &mut simulator);
+                    selected_actions.insert(0, action);
+                }
                 current_state = simulator.state_transition(&current_state, &selected_actions);
+                print!("Game Over - {:?}", simulator.calculate_rewards(&current_state));
             }
         }
         Domain::Yahtzee => {
@@ -36,16 +40,20 @@ fn main() {
             let mut rng = ChaCha8Rng::seed_from_u64(seed);
             let mut simulator = YahtzeeSimulator::new(&mut rng);
             let mut current_state = simulator.generate_initial_state();
-            loop {
+            while simulator.is_terminal_state(&current_state) == false {
                 println!("{}", current_state);
-                let action = io_agent.select_action(0, &current_state, &mut simulator);
                 let mut selected_actions: HashMap<usize, YahtzeeAction> = HashMap::new();
-                selected_actions.insert(0, action);
+                for player_id in current_state.get_current_player_ids() {
+                    let action = random_agent.select_action(player_id, &current_state, &mut simulator);
+                    selected_actions.insert(player_id, action);
+                }
                 current_state = simulator.state_transition(&current_state, &selected_actions);
+                print!("Game Over - {:?}", simulator.calculate_rewards(&current_state));
             }
         }
     };
 }
+
 enum Domain {
     Connect4,
     Yahtzee,
@@ -72,13 +80,12 @@ fn select_domain() -> Domain {
 
 fn select_seed() -> u64 {
     let mut input = String::new();
-    println!("Select a seed (u64 value):");
+    println!("Select a seed (u64 value, or press enter to select random seed):");
     loop {
         io::stdin().read_line(&mut input).unwrap();
         match input.trim().parse::<u64>() {
             Ok(seed) => break seed,
             Err(_) => {
-                println!("Invalid input: {}", input);
                 let seed = rand::random::<u64>();
                 println!("Selecting a random seed = {seed}");
                 break seed;

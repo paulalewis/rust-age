@@ -95,10 +95,87 @@ pub trait Simulator<S : State, A : Action, R : Reward> {
     /// True if no player has any legal actions from the given state.
     fn is_terminal_state(&mut self, state: &S) -> bool {
         let legal_actions = self.calculate_legal_actions(state);
-        let result = legal_actions.iter().find(|a| a.0.is_empty());
+        let result = legal_actions.iter().find(|a| !a.0.is_empty());
         return match result {
             Some(_) => false,
             None => true,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::core::reward::ScoreReward;
+
+    use super::*;
+
+    #[test]
+    fn is_terminal_state_no_legal_actions() {
+        let mut simulator = TestSimulator {
+            legal_actions: vec![LegalActions::new(), LegalActions::new()],
+        };
+        assert!(simulator.is_terminal_state(&TestState));
+    }
+    
+    #[test]
+    fn is_terminal_state_one_legal_action() {
+        let legal_actions_p2 = {
+            let mut legal_actions = LegalActions::new();
+            legal_actions.insert(TestAction);
+            legal_actions
+        };
+        let mut simulator = TestSimulator {
+            legal_actions: vec![LegalActions::new(), legal_actions_p2],
+        };
+        assert!(!simulator.is_terminal_state(&TestState));
+    }
+
+    #[derive(Clone, fmt::Debug, Hash, PartialEq, Eq)]
+    struct TestState;
+
+    impl State for TestState {
+        fn get_current_player_ids(&self) -> Vec<usize> {
+            vec![0, 1]
+        }
+    }
+
+    impl fmt::Display for TestState {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            write!(f, "TestState")
+        }
+    }
+
+    #[derive(Clone, fmt::Debug, Hash, PartialEq, Eq)]
+    struct TestAction;
+
+    impl Action for TestAction {}
+    
+    impl fmt::Display for TestAction {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            write!(f, "TestAction")
+        }
+    }
+
+    struct TestSimulator {
+        legal_actions: Vec<LegalActions<TestAction>>,
+    }
+
+    impl Simulator<TestState, TestAction, ScoreReward> for TestSimulator {
+
+        fn generate_initial_state(&mut self) -> TestState {
+            TestState
+        }
+
+        fn calculate_rewards(&mut self, _: &TestState) -> Vec<ScoreReward> {
+            vec![ScoreReward(0), ScoreReward(0)]
+        }
+
+        fn calculate_legal_actions(&mut self, _: &TestState) -> Vec<LegalActions<TestAction>> {
+            self.legal_actions.clone()
+        }
+
+        fn state_transition(&mut self, _: &TestState, _: &HashMap<usize, TestAction>) -> TestState {
+            TestState
         }
     }
 }
