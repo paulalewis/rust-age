@@ -14,6 +14,7 @@ const BOTTOM_ROW: u64 = ALL_LOCATIONS / FIRST_COLUMN;
 const ABOVE_TOP_ROW: u64 = BOTTOM_ROW << BOARD_HEIGHT;
 
 pub struct Connect4Simulator {
+    /// todo - figure out how to use an object pool
     action_pool: [Connect4Action; BOARD_WIDTH],
     column_heights_cache: HashMap<Connect4State, [u8; BOARD_WIDTH]>,
     rewards_cache: HashMap<Connect4State, Vec<AdversarialReward>>,

@@ -23,7 +23,7 @@ fn main() {
             println!("Connect 4");
             let mut simulator = Connect4Simulator::new();
             let mut current_state = simulator.generate_initial_state();
-            loop {
+            while !simulator.is_terminal_state(&current_state) {
                 println!("{}", current_state);
                 let mut selected_actions: HashMap<usize, Connect4Action> = HashMap::new();
                 for player_id in current_state.get_current_player_ids() {
@@ -31,8 +31,8 @@ fn main() {
                     selected_actions.insert(0, action);
                 }
                 current_state = simulator.state_transition(&current_state, &selected_actions);
-                print!("Game Over - {:?}", simulator.calculate_rewards(&current_state));
             }
+            print!("Game Over - {:?}", simulator.calculate_rewards(&current_state));
         }
         Domain::Yahtzee => {
             println!("Yahtzee");
@@ -40,7 +40,7 @@ fn main() {
             let mut rng = ChaCha8Rng::seed_from_u64(seed);
             let mut simulator = YahtzeeSimulator::new(&mut rng);
             let mut current_state = simulator.generate_initial_state();
-            while simulator.is_terminal_state(&current_state) == false {
+            while !simulator.is_terminal_state(&current_state) {
                 println!("{}", current_state);
                 let mut selected_actions: HashMap<usize, YahtzeeAction> = HashMap::new();
                 for player_id in current_state.get_current_player_ids() {
@@ -48,8 +48,8 @@ fn main() {
                     selected_actions.insert(player_id, action);
                 }
                 current_state = simulator.state_transition(&current_state, &selected_actions);
-                print!("Game Over - {:?}", simulator.calculate_rewards(&current_state));
             }
+            print!("Game Over - {:?}", simulator.calculate_rewards(&current_state));
         }
     };
 }
