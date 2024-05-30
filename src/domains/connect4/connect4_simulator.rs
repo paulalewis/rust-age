@@ -1,7 +1,7 @@
 use crate::core::reward::{ADVERSARIAL_DRAW, ADVERSARIAL_P1_LOSS, ADVERSARIAL_P1_WIN, DRAW};
 use crate::core::simulator::{Simulator, LegalActions};
 
-use super::connect4_constants::{BOARD_WIDTH, BOARD_HEIGHT};
+use super::constants::{BOARD_WIDTH, BOARD_HEIGHT};
 use super::connect4_state::Connect4State;
 use super::connect4_action::Connect4Action;
 

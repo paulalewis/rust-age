@@ -2,7 +2,8 @@ use std::fmt::{Display, self};
 
 use crate::core::simulator::State;
 
-use super::connect4_constants::{BOARD_HEIGHT, BOARD_WIDTH};
+use super::constants::{BOARD_HEIGHT, BOARD_WIDTH};
+use super::util::count_ones;
 
 /// Connect 4 board state.
 /// 
@@ -21,19 +22,7 @@ pub struct Connect4State {
 
 impl Connect4State {
     pub fn player_1_turn(&self) -> bool {
-        return Connect4State::count_ones(self.bit_board[0]) <= Connect4State::count_ones(self.bit_board[1]);
-    }
-
-    fn count_ones(value: u64) -> u8 {
-        let mut count = 0;
-        let mut new_value = value;
-        for _ in 0..64 {
-            if value & 1 == 1 {
-                count += 1;
-            }
-            new_value = new_value >> 1;
-        }
-        return count;
+        return count_ones(self.bit_board[0]) <= count_ones(self.bit_board[1]);
     }
 }
 
@@ -96,5 +85,11 @@ mod tests {
                               ----X--\n\
                               -O-XO--";
         assert_eq!(state.to_string(), expected);
+    }
+
+    #[test]
+    fn player_1_turn_empty() {
+        let state = Connect4State { bit_board: [0, 0] };
+        assert_eq!(state.player_1_turn(), true);
     }
 }

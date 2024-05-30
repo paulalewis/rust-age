@@ -12,7 +12,7 @@ impl Action for Connect4Action {}
 
 impl fmt::Display for Connect4Action {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({})", self.location + 1)
+        write!(f, "{}", self.location + 1)
     }
 }
 
@@ -23,6 +23,6 @@ mod tests {
     #[test]
     fn connect4_action_to_string() {
         let action = Connect4Action { location: 0 };
-        assert_eq!(action.to_string(), "(1)");
+        assert_eq!(action.to_string(), "1");
     }
 }
