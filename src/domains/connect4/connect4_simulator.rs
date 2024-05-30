@@ -14,8 +14,6 @@ const BOTTOM_ROW: u64 = ALL_LOCATIONS / FIRST_COLUMN;
 const ABOVE_TOP_ROW: u64 = BOTTOM_ROW << BOARD_HEIGHT;
 
 pub struct Connect4Simulator {
-    /// todo - figure out how to use an object pool
-    action_pool: [Connect4Action; BOARD_WIDTH],
     column_heights_cache: HashMap<Connect4State, [u8; BOARD_WIDTH]>,
     rewards_cache: HashMap<Connect4State, Vec<AdversarialReward>>,
     legal_actions_cache: HashMap<Connect4State, Vec<LegalActions<Connect4Action>>>,
@@ -24,15 +22,6 @@ pub struct Connect4Simulator {
 impl Connect4Simulator {
     pub fn new() -> Self {
         Connect4Simulator {
-            action_pool: [
-                Connect4Action { location: 0 },
-                Connect4Action { location: 1 },
-                Connect4Action { location: 2 },
-                Connect4Action { location: 3 },
-                Connect4Action { location: 4 },
-                Connect4Action { location: 5 },
-                Connect4Action { location: 6 },
-            ],
             column_heights_cache: HashMap::new(),
             rewards_cache: HashMap::new(),
             legal_actions_cache: HashMap::new(),

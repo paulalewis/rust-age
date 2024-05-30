@@ -3,7 +3,7 @@ use std::fmt;
 use crate::core::simulator::Action;
 
 /// Represents a slot location to place a piece.
-#[derive(Clone, fmt::Debug, Hash, PartialEq, Eq)]
+#[derive(Clone, Copy, fmt::Debug, Hash, PartialEq, Eq)]
 pub struct Connect4Action {
     pub location: u8,
 }

@@ -12,15 +12,18 @@ use rand_chacha::ChaCha8Rng;
 
 use std::collections::HashMap;
 use std::io;
+use std::fmt;
 
 fn main() {
-    let domain = select_domain();
+    let domains = vec![Domain::Connect4, Domain::Yahtzee];
+    let domain = select_domain(domains);
     let mut random_agent = RandomAgent::new();
     let mut io_agent = IoAgent::new();
 
+    println!("{domain}");
+
     match domain {
         Domain::Connect4 => {
-            println!("Connect 4");
             let mut simulator = Connect4Simulator::new();
             let mut current_state = simulator.generate_initial_state();
             while !simulator.is_terminal_state(&current_state) {
@@ -35,7 +38,6 @@ fn main() {
             print!("Game Over - {:?}", simulator.calculate_rewards(&current_state));
         }
         Domain::Yahtzee => {
-            println!("Yahtzee");
             let seed = select_seed();
             let mut rng = ChaCha8Rng::seed_from_u64(seed);
             let mut simulator = YahtzeeSimulator::new(&mut rng);
@@ -54,23 +56,41 @@ fn main() {
     };
 }
 
+#[derive(Clone, Copy)]
 enum Domain {
     Connect4,
     Yahtzee,
 }
 
-fn select_domain() -> Domain {
+impl fmt::Display for Domain {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Domain::Connect4 => write!(f, "Connect 4"),
+            Domain::Yahtzee => write!(f, "Yahtzee"),
+        }
+    }
+}
+
+fn select_domain(domains: Vec<Domain>) -> Domain {
     let mut input = String::new();
-    println!("Select a domain:");
-    println!("1) Connect 4");
-    println!("2) Yatzee");
+
+    println!("Select domain:");
+
+    for (i, domain) in domains.iter().enumerate() {
+        let j = i + 1;
+        println!("{j} {domain}");
+    }
     
     loop {
         io::stdin().read_line(&mut input).unwrap();
-        match input.trim() {
-            "1" => break Domain::Connect4,
-            "2" => break Domain::Yahtzee,
-            _ => {
+        let value = input.trim().parse::<usize>();
+        let choice = match value {
+            Ok(value) => domains.get(value - 1),
+            Err(_) => None,
+        };
+        match choice {
+            Some(domain) => break domain.clone(),
+            None => {
                 println!("Invalid input: {}", input);
                 input.clear();
             },
