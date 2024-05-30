@@ -4,8 +4,6 @@ use std::vec::Vec;
 use std::collections::hash_map::HashMap;
 use std::collections::hash_set::HashSet;
 
-use super::reward::Reward;
-
 pub trait Action : Clone + fmt::Debug + fmt::Display + Hash + Eq {}
 pub trait State : Clone + fmt::Debug + fmt::Display + Hash + Eq {
     fn get_current_player_ids(&self) -> Vec<usize>;
@@ -40,7 +38,7 @@ impl <A : Action> fmt::Display for LegalActions<A> {
 
 /// A simulator controls the state transitions of a given domain
 /// and is associated with a domain specific state and action type.
-pub trait Simulator<S : State, A : Action, R : Reward> {
+pub trait Simulator<S : State, A : Action> {
     /// Generates an initial state for the domain.
     /// 
     /// The initial state returned is not necessarily always
@@ -61,7 +59,7 @@ pub trait Simulator<S : State, A : Action, R : Reward> {
     /// 
     /// Returns a reward value for each player that can be
     /// indexed by the player ID.
-    fn calculate_rewards(&mut self, state: &S) -> Vec<R>;
+    fn calculate_rewards(&mut self, state: &S) -> Vec<isize>;
 
     /// @param state the state from which to calculate rewards
     /// @return list of legal actions for each player
@@ -105,8 +103,6 @@ pub trait Simulator<S : State, A : Action, R : Reward> {
 
 #[cfg(test)]
 mod tests {
-    use crate::core::reward::ScoreReward;
-
     use super::*;
 
     #[test]
@@ -160,14 +156,14 @@ mod tests {
         legal_actions: Vec<LegalActions<TestAction>>,
     }
 
-    impl Simulator<TestState, TestAction, ScoreReward> for TestSimulator {
+    impl Simulator<TestState, TestAction> for TestSimulator {
 
         fn generate_initial_state(&mut self) -> TestState {
             TestState
         }
 
-        fn calculate_rewards(&mut self, _: &TestState) -> Vec<ScoreReward> {
-            vec![ScoreReward(0), ScoreReward(0)]
+        fn calculate_rewards(&mut self, _: &TestState) -> Vec<isize> {
+            vec![0, 0]
         }
 
         fn calculate_legal_actions(&mut self, _: &TestState) -> Vec<LegalActions<TestAction>> {

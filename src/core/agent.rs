@@ -3,7 +3,6 @@ use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
 use std::io;
 
-use super::reward::Reward;
 use super::simulator::Action;
 use super::simulator::Simulator;
 use super::simulator::State;
@@ -25,11 +24,10 @@ pub trait Agent {
     /// ### Return Value
     /// 
     /// The selected action from the current state.
-    fn select_action<S, A, R, I>(&mut self, player_id: usize, state: &S, simulator: &mut I) -> A where
+    fn select_action<S, A, I>(&mut self, player_id: usize, state: &S, simulator: &mut I) -> A where
         S: State,
         A: Action,
-        R: Reward,
-        I: Simulator<S, A, R>;
+        I: Simulator<S, A>;
 }
 
 /// An IoAgent selects an action by prompting the user.
@@ -42,11 +40,10 @@ impl IoAgent {
 }
 
 impl Agent for IoAgent {
-    fn select_action<S, A, R, I>(&mut self, player_id: usize, state: &S, simulator: &mut I) -> A where
+    fn select_action<S, A, I>(&mut self, player_id: usize, state: &S, simulator: &mut I) -> A where
         S: State,
         A: Action,
-        R: Reward,
-        I: Simulator<S, A, R>,
+        I: Simulator<S, A>,
     {
         let mut input = String::new();
 
@@ -80,11 +77,10 @@ impl RandomAgent {
 }
 
 impl Agent for RandomAgent {
-    fn select_action<S, A, R, I>(&mut self, player_id: usize, state: &S, simulator: &mut I) -> A where 
+    fn select_action<S, A, I>(&mut self, player_id: usize, state: &S, simulator: &mut I) -> A where 
         S: State,
         A: Action,
-        R: Reward,
-        I: Simulator<S, A, R>,
+        I: Simulator<S, A>,
     {
         let player_legal_actions = &simulator.calculate_legal_actions(&state)[player_id];
         let random_index = self.rng.gen_range(0..player_legal_actions.0.len());
