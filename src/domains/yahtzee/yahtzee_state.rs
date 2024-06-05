@@ -22,11 +22,7 @@ impl YahtzeeState {
     }
 }
 
-impl State for YahtzeeState {
-    fn get_current_player_ids(&self) -> Vec<usize> {
-        return vec![0];
-    }
-}
+impl State for YahtzeeState {}
 
 impl fmt::Display for YahtzeeState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

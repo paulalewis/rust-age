@@ -5,9 +5,7 @@ use std::collections::hash_map::HashMap;
 use std::collections::hash_set::HashSet;
 
 pub trait Action : Clone + fmt::Debug + fmt::Display + Hash + Eq {}
-pub trait State : Clone + fmt::Debug + fmt::Display + Hash + Eq {
-    fn get_current_player_ids(&self) -> Vec<usize>;
-}
+pub trait State : Clone + fmt::Debug + fmt::Display + Hash + Eq {}
 
 #[derive(Clone)]
 pub struct LegalActions<A : Action>(pub HashSet<A>);
@@ -71,6 +69,9 @@ pub trait Simulator<S : State, A : Action> {
     /// @param actions map of actions to be performed by each player
     fn state_transition(&mut self, state: &S, actions: &HashMap<usize, A>) -> S;
     
+    /// The player IDs of the current players in the domain.
+    fn get_current_player_ids(&self, state: &S) -> Vec<usize>;
+    
     /// The number of players in this domain.
     /// 
     /// The number of players can be affected by
@@ -129,11 +130,7 @@ mod tests {
     #[derive(Clone, fmt::Debug, Hash, PartialEq, Eq)]
     struct TestState;
 
-    impl State for TestState {
-        fn get_current_player_ids(&self) -> Vec<usize> {
-            vec![0, 1]
-        }
-    }
+    impl State for TestState {}
 
     impl fmt::Display for TestState {
         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -172,6 +169,10 @@ mod tests {
 
         fn state_transition(&mut self, _: &TestState, _: &HashMap<usize, TestAction>) -> TestState {
             TestState
+        }
+        
+        fn get_current_player_ids(&self, _state: &TestState) -> Vec<usize> {
+            vec![0, 1]
         }
     }
 }

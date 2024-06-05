@@ -2,7 +2,6 @@ use abstract_game_engine::core::agent::Agent;
 use abstract_game_engine::core::simulator::Simulator;
 use abstract_game_engine::core::agent::RandomAgent;
 use abstract_game_engine::core::agent::IoAgent;
-use abstract_game_engine::core::simulator::State;
 use abstract_game_engine::domains::connect4::connect4_action::Connect4Action;
 use abstract_game_engine::domains::connect4::connect4_simulator::Connect4Simulator;
 use abstract_game_engine::domains::yahtzee::yahtzee_action::YahtzeeAction;
@@ -29,7 +28,7 @@ fn main() {
             while !simulator.is_terminal_state(&current_state) {
                 println!("{}", current_state);
                 let mut selected_actions: HashMap<usize, Connect4Action> = HashMap::new();
-                for player_id in current_state.get_current_player_ids() {
+                for player_id in simulator.get_current_player_ids(&current_state) {
                     let action = io_agent.select_action(player_id, &current_state, &mut simulator);
                     selected_actions.insert(0, action);
                 }
@@ -45,7 +44,7 @@ fn main() {
             while !simulator.is_terminal_state(&current_state) {
                 println!("{}", current_state);
                 let mut selected_actions: HashMap<usize, YahtzeeAction> = HashMap::new();
-                for player_id in current_state.get_current_player_ids() {
+                for player_id in simulator.get_current_player_ids(&current_state) {
                     let action = random_agent.select_action(player_id, &current_state, &mut simulator);
                     selected_actions.insert(player_id, action);
                 }

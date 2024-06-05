@@ -26,15 +26,7 @@ impl Connect4State {
     }
 }
 
-impl State for Connect4State {
-    fn get_current_player_ids(&self) -> Vec<usize> {
-        if self.player_1_turn() {
-            return vec![0];
-        } else {
-            return vec![1];
-        }
-    }
-}
+impl State for Connect4State {}
 
 impl Display for Connect4State {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
