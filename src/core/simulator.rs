@@ -4,6 +4,8 @@ use std::vec::Vec;
 use std::collections::hash_map::HashMap;
 use std::collections::hash_set::HashSet;
 
+use super::reward::Reward;
+
 pub trait Action : Clone + fmt::Debug + fmt::Display + Hash + Eq {}
 pub trait State : Clone + fmt::Debug + fmt::Display + Hash + Eq {}
 
@@ -57,7 +59,7 @@ pub trait Simulator<S : State, A : Action> {
     /// 
     /// Returns a reward value for each player that can be
     /// indexed by the player ID.
-    fn calculate_rewards(&mut self, state: &S) -> Vec<isize>;
+    fn calculate_rewards(&mut self, state: &S) -> Vec<Reward>;
 
     /// @param state the state from which to calculate rewards
     /// @return list of legal actions for each player
@@ -104,6 +106,8 @@ pub trait Simulator<S : State, A : Action> {
 
 #[cfg(test)]
 mod tests {
+    use crate::core::reward::ADVERSARIAL_DRAW;
+
     use super::*;
 
     #[test]
@@ -159,8 +163,8 @@ mod tests {
             TestState
         }
 
-        fn calculate_rewards(&mut self, _: &TestState) -> Vec<isize> {
-            vec![0, 0]
+        fn calculate_rewards(&mut self, _: &TestState) -> Vec<Reward> {
+            ADVERSARIAL_DRAW.to_vec()
         }
 
         fn calculate_legal_actions(&mut self, _: &TestState) -> Vec<LegalActions<TestAction>> {

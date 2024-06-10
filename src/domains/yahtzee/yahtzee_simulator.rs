@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use rand::{SeedableRng, RngCore};
 use rand_chacha::ChaCha8Rng;
 
-use crate::core::simulator::{Simulator, LegalActions};
+use crate::core::{reward::Reward, simulator::{LegalActions, Simulator}};
 
 use super::{yahtzee_state::YahtzeeState, yahtzee_action::YahtzeeAction, yahtzee_score_category::YahtzeeScoreCategory, constants::{N_VALUES, N_DICE}};
 
@@ -44,7 +44,7 @@ impl <'a> Simulator<YahtzeeState, YahtzeeAction> for YahtzeeSimulator<'a> {
         }
     }
 
-    fn calculate_rewards(&mut self, state: &YahtzeeState) -> Vec<isize> {
+    fn calculate_rewards(&mut self, state: &YahtzeeState) -> Vec<Reward> {
         let mut score = 0u16;
         if !state.has_categories_left() {
             let scores = state.scores.iter().map(|&x| x.unwrap_or(0) as u16).collect::<Vec<u16>>();
@@ -58,7 +58,7 @@ impl <'a> Simulator<YahtzeeState, YahtzeeAction> for YahtzeeSimulator<'a> {
                 score += scores[i];
             }
         }
-        return vec![score as isize];
+        return vec![Reward(score as isize)];
     }
 
     fn calculate_legal_actions(&mut self, state: &YahtzeeState) -> Vec<LegalActions<YahtzeeAction>> {

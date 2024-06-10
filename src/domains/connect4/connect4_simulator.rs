@@ -1,4 +1,4 @@
-use crate::core::reward::{ADVERSARIAL_DRAW, ADVERSARIAL_P1_LOSS, ADVERSARIAL_P1_WIN, DRAW};
+use crate::core::reward::{Reward, ADVERSARIAL_DRAW, ADVERSARIAL_P1_LOSS, ADVERSARIAL_P1_WIN, DRAW};
 use crate::core::simulator::{Simulator, LegalActions};
 
 use super::constants::{BOARD_WIDTH, BOARD_HEIGHT};
@@ -15,7 +15,7 @@ const ABOVE_TOP_ROW: u64 = BOTTOM_ROW << BOARD_HEIGHT;
 
 pub struct Connect4Simulator {
     column_heights_cache: HashMap<Connect4State, [u8; BOARD_WIDTH]>,
-    rewards_cache: HashMap<Connect4State, Vec<isize>>,
+    rewards_cache: HashMap<Connect4State, Vec<Reward>>,
     legal_actions_cache: HashMap<Connect4State, Vec<LegalActions<Connect4Action>>>,
 }
 
@@ -45,7 +45,7 @@ impl Simulator<Connect4State, Connect4Action> for Connect4Simulator {
         Connect4State { bit_board: [0, 0] }
     }
 
-    fn calculate_rewards(&mut self, state: &Connect4State) -> Vec<isize> {
+    fn calculate_rewards(&mut self, state: &Connect4State) -> Vec<Reward> {
         let cache = self.rewards_cache.get(state);
         let rewards = match cache {
             Some(rewards) => rewards.clone(),
@@ -91,7 +91,7 @@ impl Simulator<Connect4State, Connect4Action> for Connect4Simulator {
 
 fn calculate_legal_actions(
     state: &Connect4State,
-    rewards: &Vec<isize>,
+    rewards: &Vec<Reward>,
     column_heights: [u8; BOARD_WIDTH], 
 ) -> Vec<LegalActions<Connect4Action>> {
     let mut legal_actions = vec![LegalActions::<Connect4Action>::new(); N_PLAYERS];
@@ -104,7 +104,7 @@ fn calculate_legal_actions(
     return legal_actions;
 }
 
-fn calculate_rewards(state: &Connect4State) -> Vec<isize> {
+fn calculate_rewards(state: &Connect4State) -> Vec<Reward> {
     let height = BOARD_HEIGHT;
     for i in 0..N_PLAYERS {
         let bit_board = state.bit_board[1];
