@@ -44,13 +44,13 @@ impl Agent for DefaultAgents {
         A: Action,
         I: Simulator<S, A>,
     {
+        let player_legal_actions = &simulator.calculate_legal_actions(&state)[player_id];
+        
         match self {
             DefaultAgents::Io => {
                 let mut input = String::new();
 
                 loop {
-                    let player_legal_actions = &simulator.calculate_legal_actions(&state)[player_id];
-
                     println!("Select an action:\n{}", player_legal_actions);
 
                     io::stdin().read_line(&mut input).unwrap();
@@ -65,7 +65,6 @@ impl Agent for DefaultAgents {
                 }
             },
             DefaultAgents::Random(rng) => {
-                let player_legal_actions = &simulator.calculate_legal_actions(&state)[player_id];
                 let random_index = rng.gen_range(0..player_legal_actions.0.len());
                 player_legal_actions.0.iter().nth(random_index).expect("Index should always be in bounds.").clone()
             },

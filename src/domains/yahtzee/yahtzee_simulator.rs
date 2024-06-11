@@ -151,6 +151,10 @@ impl <'a> Simulator<YahtzeeState, YahtzeeAction> for YahtzeeSimulator<'a> {
     fn get_current_player_ids(&self, _state: &YahtzeeState) -> Vec<usize> {
         vec![0]
     }
+    
+    fn number_of_players(&mut self) -> usize {
+        1
+    }
 }
 
 fn score_ones(dice_values: &[u8; N_VALUES]) -> u16 {

@@ -74,15 +74,8 @@ pub trait Simulator<S : State, A : Action> {
     /// The player IDs of the current players in the domain.
     fn get_current_player_ids(&self, state: &S) -> Vec<usize>;
     
-    /// The number of players in this domain.
-    /// 
-    /// The number of players can be affected by
-    /// the current state, e.g. a multiplayer
-    /// game where one player is eliminated but
-    /// play continues.
-    fn number_of_players(&mut self, state: &S) -> usize {
-        return self.calculate_legal_actions(state).len();
-    }
+    /// The total number of players in this domain.
+    fn number_of_players(&mut self) -> usize;
 
     /// A state is terminal if no player has any
     /// legal actions from the current state.
@@ -177,6 +170,10 @@ mod tests {
         
         fn get_current_player_ids(&self, _state: &TestState) -> Vec<usize> {
             vec![0, 1]
+        }
+        
+        fn number_of_players(&mut self) -> usize {
+            2
         }
     }
 }

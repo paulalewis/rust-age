@@ -87,6 +87,10 @@ impl Simulator<Connect4State, Connect4Action> for Connect4Simulator {
             return vec![1];
         }
     }
+    
+    fn number_of_players(&mut self) -> usize {
+        2
+    }
 }
 
 fn calculate_legal_actions(

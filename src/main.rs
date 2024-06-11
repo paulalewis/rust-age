@@ -17,42 +17,52 @@ fn main() {
 
     println!("{domain}");
 
-    match domain {
+    let rewards = match domain {
         Domain::Connect4 => {
             let mut simulator = Connect4Simulator::new();
             let mut current_state = simulator.generate_initial_state();
-            let mut agents: HashMap<usize, DefaultAgents> = select_agents(simulator.get_current_player_ids(&current_state));
+            let mut agents: Vec<DefaultAgents> = select_agents(simulator.number_of_players());
 
             while !simulator.is_terminal_state(&current_state) {
                 println!("{}", current_state);
                 let mut selected_actions: HashMap<usize, Connect4Action> = HashMap::new();
-                for player_id in simulator.get_current_player_ids(&current_state) {
-                    let action = agents.get_mut(&player_id).unwrap().select_action(player_id, &current_state, &mut simulator);
+                let player_legal_actions = simulator.calculate_legal_actions(&current_state);
+                for player_id in 0..simulator.number_of_players() {
+                    if player_legal_actions[player_id].0.is_empty() {
+                        continue;
+                    }
+                    let action = agents[player_id].select_action(player_id, &current_state, &mut simulator);
                     selected_actions.insert(0, action);
                 }
                 current_state = simulator.state_transition(&current_state, &selected_actions);
             }
-            print!("Game Over - {:?}", simulator.calculate_rewards(&current_state));
+            simulator.calculate_rewards(&current_state)
         }
         Domain::Yahtzee => {
             let seed = select_seed();
             let mut rng = ChaCha8Rng::seed_from_u64(seed);
             let mut simulator = YahtzeeSimulator::new(&mut rng);
             let mut current_state = simulator.generate_initial_state();
-            let mut agents: HashMap<usize, DefaultAgents> = select_agents(simulator.get_current_player_ids(&current_state));
+            let mut agents: Vec<DefaultAgents> = select_agents(simulator.number_of_players());
             
             while !simulator.is_terminal_state(&current_state) {
                 println!("{}", current_state);
                 let mut selected_actions: HashMap<usize, YahtzeeAction> = HashMap::new();
-                for player_id in simulator.get_current_player_ids(&current_state) {
-                    let action = agents.get_mut(&player_id).unwrap().select_action(player_id, &current_state, &mut simulator);
-                    selected_actions.insert(player_id, action);
+                let player_legal_actions = simulator.calculate_legal_actions(&current_state);
+                for player_id in 0..simulator.number_of_players() {
+                    if player_legal_actions[player_id].0.is_empty() {
+                        continue;
+                    }
+                    let action = agents[player_id].select_action(player_id, &current_state, &mut simulator);
+                    selected_actions.insert(0, action);
                 }
                 current_state = simulator.state_transition(&current_state, &selected_actions);
             }
-            print!("Game Over - {:?}", simulator.calculate_rewards(&current_state));
+            simulator.calculate_rewards(&current_state)
         }
     };
+    
+    print!("Game Over - {:?}", rewards);
 }
 
 #[derive(Clone, Copy)]
@@ -114,9 +124,9 @@ fn select_seed() -> u64 {
     }
 }
 
-fn select_agents(player_ids: Vec<usize>) -> HashMap<usize, DefaultAgents> {
-    let mut agents: HashMap<usize, DefaultAgents> = HashMap::new();
-    for player_id in player_ids {
+fn select_agents(number_of_players: usize) -> Vec<DefaultAgents> {
+    let mut agents: Vec<DefaultAgents> = Vec::new();
+    for player_id in 0..number_of_players {
         println!("Select Player {player_id} Agent");
         agents.insert(player_id, select_agent());
     }
