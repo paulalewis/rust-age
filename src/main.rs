@@ -1,7 +1,6 @@
 use abstract_game_engine::core::agent::Agent;
+use abstract_game_engine::core::agent::DefaultAgents;
 use abstract_game_engine::core::simulator::Simulator;
-use abstract_game_engine::core::agent::RandomAgent;
-use abstract_game_engine::core::agent::IoAgent;
 use abstract_game_engine::domains::connect4::connect4_action::Connect4Action;
 use abstract_game_engine::domains::connect4::connect4_simulator::Connect4Simulator;
 use abstract_game_engine::domains::yahtzee::yahtzee_action::YahtzeeAction;
@@ -14,10 +13,7 @@ use std::io;
 use std::fmt;
 
 fn main() {
-    let domains = vec![Domain::Connect4, Domain::Yahtzee];
-    let domain = select_domain(domains);
-    let mut random_agent = RandomAgent::new();
-    let mut io_agent = IoAgent::new();
+    let domain = select_domain();
 
     println!("{domain}");
 
@@ -25,11 +21,13 @@ fn main() {
         Domain::Connect4 => {
             let mut simulator = Connect4Simulator::new();
             let mut current_state = simulator.generate_initial_state();
+            let mut agents: HashMap<usize, DefaultAgents> = select_agents(simulator.get_current_player_ids(&current_state));
+
             while !simulator.is_terminal_state(&current_state) {
                 println!("{}", current_state);
                 let mut selected_actions: HashMap<usize, Connect4Action> = HashMap::new();
                 for player_id in simulator.get_current_player_ids(&current_state) {
-                    let action = io_agent.select_action(player_id, &current_state, &mut simulator);
+                    let action = agents.get_mut(&player_id).unwrap().select_action(player_id, &current_state, &mut simulator);
                     selected_actions.insert(0, action);
                 }
                 current_state = simulator.state_transition(&current_state, &selected_actions);
@@ -41,11 +39,13 @@ fn main() {
             let mut rng = ChaCha8Rng::seed_from_u64(seed);
             let mut simulator = YahtzeeSimulator::new(&mut rng);
             let mut current_state = simulator.generate_initial_state();
+            let mut agents: HashMap<usize, DefaultAgents> = select_agents(simulator.get_current_player_ids(&current_state));
+            
             while !simulator.is_terminal_state(&current_state) {
                 println!("{}", current_state);
                 let mut selected_actions: HashMap<usize, YahtzeeAction> = HashMap::new();
                 for player_id in simulator.get_current_player_ids(&current_state) {
-                    let action = random_agent.select_action(player_id, &current_state, &mut simulator);
+                    let action = agents.get_mut(&player_id).unwrap().select_action(player_id, &current_state, &mut simulator);
                     selected_actions.insert(player_id, action);
                 }
                 current_state = simulator.state_transition(&current_state, &selected_actions);
@@ -70,7 +70,8 @@ impl fmt::Display for Domain {
     }
 }
 
-fn select_domain(domains: Vec<Domain>) -> Domain {
+fn select_domain() -> Domain {
+    let domains = vec![Domain::Connect4, Domain::Yahtzee];
     let mut input = String::new();
 
     println!("Select domain:");
@@ -108,6 +109,39 @@ fn select_seed() -> u64 {
                 let seed = rand::random::<u64>();
                 println!("Selecting a random seed = {seed}");
                 break seed;
+            },
+        }
+    }
+}
+
+fn select_agents(player_ids: Vec<usize>) -> HashMap<usize, DefaultAgents> {
+    let mut agents: HashMap<usize, DefaultAgents> = HashMap::new();
+    for player_id in player_ids {
+        println!("Select Player {player_id} Agent");
+        agents.insert(player_id, select_agent());
+    }
+    agents
+}
+
+fn select_agent() -> DefaultAgents {
+    let mut input = String::new();
+
+    println!("1 Random Agent");
+    println!("2 Io Agent");
+    
+    loop {
+        io::stdin().read_line(&mut input).unwrap();
+        let value = input.trim().parse::<usize>();
+        let choice = match value {
+            Ok(value) => Some(value),
+            Err(_) => None,
+        };
+        match choice {
+            Some(1) => break DefaultAgents::Random(ChaCha8Rng::from_entropy()),
+            Some(2) => break DefaultAgents::Io,
+            Some(_) | None => {
+                println!("Invalid input: {}", input);
+                input.clear();
             },
         }
     }

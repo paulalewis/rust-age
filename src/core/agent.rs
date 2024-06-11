@@ -1,6 +1,6 @@
 use rand::Rng;
-use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
+use std::fmt;
 use std::io;
 
 use super::simulator::Action;
@@ -30,60 +30,54 @@ pub trait Agent {
         I: Simulator<S, A>;
 }
 
-/// An IoAgent selects an action by prompting the user.
-pub struct IoAgent {}
-
-impl IoAgent {
-    pub fn new() -> Self {
-        IoAgent {}
-    }
+#[derive(Debug)]
+pub enum DefaultAgents {
+    /// Selects an action by prompting the user.
+    Io,
+    /// Selects a random action from the list of legal actions.
+    Random(ChaCha8Rng),
 }
 
-impl Agent for IoAgent {
+impl Agent for DefaultAgents {
     fn select_action<S, A, I>(&mut self, player_id: usize, state: &S, simulator: &mut I) -> A where
         S: State,
         A: Action,
         I: Simulator<S, A>,
     {
-        let mut input = String::new();
+        match self {
+            DefaultAgents::Io => {
+                let mut input = String::new();
 
-        loop {
-            let player_legal_actions = &simulator.calculate_legal_actions(&state)[player_id];
+                loop {
+                    let player_legal_actions = &simulator.calculate_legal_actions(&state)[player_id];
 
-            println!("Select an action:\n{}", player_legal_actions);
+                    println!("Select an action:\n{}", player_legal_actions);
 
-            io::stdin().read_line(&mut input).unwrap();
+                    io::stdin().read_line(&mut input).unwrap();
 
-            match player_legal_actions.0.iter().find(|action| { action.to_string() == input.trim() }) {
-                Some(action) => break action.clone(),
-                None => {
-                    println!("Not a legal action: {}", input);
-                    input.clear();
-                },
-            }
+                    match player_legal_actions.0.iter().find(|action| { action.to_string() == input.trim() }) {
+                        Some(action) => break action.clone(),
+                        None => {
+                            println!("Not a legal action: {}", input);
+                            input.clear();
+                        },
+                    }
+                }
+            },
+            DefaultAgents::Random(rng) => {
+                let player_legal_actions = &simulator.calculate_legal_actions(&state)[player_id];
+                let random_index = rng.gen_range(0..player_legal_actions.0.len());
+                player_legal_actions.0.iter().nth(random_index).expect("Index should always be in bounds.").clone()
+            },
         }
     }
 }
 
-/// A RandomAgent selects a random action from the list of legal actions.
-pub struct RandomAgent {
-    rng: ChaCha8Rng,
-}
-
-impl RandomAgent {
-    pub fn new() -> Self {
-        RandomAgent { rng: ChaCha8Rng::from_entropy() }
-    }
-}
-
-impl Agent for RandomAgent {
-    fn select_action<S, A, I>(&mut self, player_id: usize, state: &S, simulator: &mut I) -> A where 
-        S: State,
-        A: Action,
-        I: Simulator<S, A>,
-    {
-        let player_legal_actions = &simulator.calculate_legal_actions(&state)[player_id];
-        let random_index = self.rng.gen_range(0..player_legal_actions.0.len());
-        player_legal_actions.0.iter().nth(random_index).expect("Index should always be in bounds.").clone()
+impl fmt::Display for DefaultAgents {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            DefaultAgents::Io => write!(f, "Io Agent"),
+            DefaultAgents::Random(_) => write!(f, "Random Agent"),
+        }
     }
 }
