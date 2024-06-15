@@ -80,14 +80,6 @@ impl Simulator<Connect4State, Connect4Action> for Connect4Simulator {
         return state;
     }
     
-    fn get_current_player_ids(&self, state: &Connect4State) -> Vec<usize> {
-        if state.player_1_turn() {
-            return vec![0];
-        } else {
-            return vec![1];
-        }
-    }
-    
     fn number_of_players(&mut self) -> usize {
         2
     }

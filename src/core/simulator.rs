@@ -71,9 +71,6 @@ pub trait Simulator<S : State, A : Action> {
     /// @param actions map of actions to be performed by each player
     fn state_transition(&mut self, state: &S, actions: &HashMap<usize, A>) -> S;
     
-    /// The player IDs of the current players in the domain.
-    fn get_current_player_ids(&self, state: &S) -> Vec<usize>;
-    
     /// The total number of players in this domain.
     fn number_of_players(&mut self) -> usize;
 
@@ -166,10 +163,6 @@ mod tests {
 
         fn state_transition(&mut self, _: &TestState, _: &HashMap<usize, TestAction>) -> TestState {
             TestState
-        }
-        
-        fn get_current_player_ids(&self, _state: &TestState) -> Vec<usize> {
-            vec![0, 1]
         }
         
         fn number_of_players(&mut self) -> usize {

@@ -148,10 +148,6 @@ impl <'a> Simulator<YahtzeeState, YahtzeeAction> for YahtzeeSimulator<'a> {
         return YahtzeeState { dice_values: dice_values, roll_number: rolls, scores: scores };
     }
     
-    fn get_current_player_ids(&self, _state: &YahtzeeState) -> Vec<usize> {
-        vec![0]
-    }
-    
     fn number_of_players(&mut self) -> usize {
         1
     }
