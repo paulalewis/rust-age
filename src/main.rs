@@ -8,7 +8,6 @@ use abstract_game_engine::domains::yahtzee::yahtzee_simulator::YahtzeeSimulator;
 use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
 
-use std::collections::HashMap;
 use std::io;
 use std::fmt;
 
@@ -25,14 +24,15 @@ fn main() {
 
             while !simulator.is_terminal_state(&current_state) {
                 println!("{}", current_state);
-                let mut selected_actions: HashMap<usize, Connect4Action> = HashMap::new();
+                let mut selected_actions: Vec<Option<Connect4Action>> = Vec::new();
                 let player_legal_actions = simulator.calculate_legal_actions(&current_state);
                 for player_id in 0..simulator.number_of_players() {
                     if player_legal_actions[player_id].0.is_empty() {
-                        continue;
+                        selected_actions.push(None);
+                    } else {
+                        let action = agents[player_id].select_action(player_id, &current_state, &mut simulator);
+                        selected_actions.push(Some(action));
                     }
-                    let action = agents[player_id].select_action(player_id, &current_state, &mut simulator);
-                    selected_actions.insert(0, action);
                 }
                 current_state = simulator.state_transition(&current_state, &selected_actions);
             }
@@ -47,14 +47,15 @@ fn main() {
             
             while !simulator.is_terminal_state(&current_state) {
                 println!("{}", current_state);
-                let mut selected_actions: HashMap<usize, YahtzeeAction> = HashMap::new();
+                let mut selected_actions: Vec<Option<YahtzeeAction>> = Vec::new();
                 let player_legal_actions = simulator.calculate_legal_actions(&current_state);
                 for player_id in 0..simulator.number_of_players() {
                     if player_legal_actions[player_id].0.is_empty() {
-                        continue;
+                        selected_actions.push(None);
+                    } else {
+                        let action = agents[player_id].select_action(player_id, &current_state, &mut simulator);
+                        selected_actions.push(Some(action));
                     }
-                    let action = agents[player_id].select_action(player_id, &current_state, &mut simulator);
-                    selected_actions.insert(0, action);
                 }
                 current_state = simulator.state_transition(&current_state, &selected_actions);
             }

@@ -95,12 +95,9 @@ impl <'a> Simulator<YahtzeeState, YahtzeeAction> for YahtzeeSimulator<'a> {
         return vec![legal_actions];
     }
 
-    fn state_transition(&mut self, state: &YahtzeeState, actions: &std::collections::HashMap<usize, YahtzeeAction>) -> YahtzeeState {
-        let action = &actions[&0];
-        let legal_actions = self.calculate_legal_actions(state);
-        if !legal_actions[0].0.contains(&action) {
-            panic!("Illegal action {action}, from state {state}");
-        }
+    fn state_transition(&mut self, state: &YahtzeeState, actions: &Vec<Option<YahtzeeAction>>) -> YahtzeeState {
+        let action = &actions[0].as_ref().unwrap();
+        self.check_valid_state_transition(state, &actions).unwrap();
 
         let mut dice_values = state.dice_values;
         let mut rolls = state.roll_number;

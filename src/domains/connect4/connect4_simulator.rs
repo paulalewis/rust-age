@@ -66,15 +66,12 @@ impl Simulator<Connect4State, Connect4Action> for Connect4Simulator {
         return legal_actions;
     }
 
-    fn state_transition(&mut self, state: &Connect4State, actions: &HashMap<usize, Connect4Action>) -> Connect4State {
+    fn state_transition(&mut self, state: &Connect4State, actions: &Vec<Option<Connect4Action>>) -> Connect4State {
         let mut state = state.clone();
         let agent_turn: usize = if state.player_1_turn() { 0 } else { 1 };
-        let action = actions.get(&agent_turn).unwrap();
-        let legal_actions = self.calculate_legal_actions(&state);
+        let action = actions[agent_turn].unwrap();
         let mut column_heights = self.calculate_column_heights(&state);
-        if legal_actions[agent_turn].iter().find(|&a| a == action) == None {
-            panic!("Illegal action, {action}, from state, {state}");
-        }
+        self.check_valid_state_transition(&state, &actions).unwrap();
         column_heights[action.location as usize] += 1;
         state.bit_board[agent_turn] = state.bit_board[agent_turn] ^ (1 << column_heights[action.location as usize]);
         return state;

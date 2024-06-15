@@ -1,7 +1,6 @@
 use std::fmt;
 use std::hash::Hash;
 use std::vec::Vec;
-use std::collections::hash_map::HashMap;
 use std::collections::hash_set::HashSet;
 
 use super::reward::Reward;
@@ -38,11 +37,10 @@ impl <A : Action> fmt::Display for LegalActions<A> {
 
 /// A simulator controls the state transitions of a given domain
 /// and is associated with a domain specific state and action type.
+/// The number of players should be fixed even if a player has
+/// been eleminated from the game.
 pub trait Simulator<S : State, A : Action> {
     /// Generates an initial state for the domain.
-    /// 
-    /// The initial state returned is not necessarily always
-    /// the same state.
     /// 
     /// ### Return Value
     /// 
@@ -57,22 +55,66 @@ pub trait Simulator<S : State, A : Action> {
     /// 
     /// ### Return Value
     /// 
-    /// Returns a reward value for each player that can be
-    /// indexed by the player ID.
+    /// Returns a reward value for each player.
     fn calculate_rewards(&mut self, state: &S) -> Vec<Reward>;
 
-    /// @param state the state from which to calculate rewards
-    /// @return list of legal actions for each player
+    /// Calculates the legal actions for each player in the domain.
+    /// 
+    /// ### Arguments
+    /// 
+    /// * `state` - The state from which to calculate legal actions.
+    /// 
+    /// ### Return Value
+    /// 
+    /// Returns a list of legal actions for each player.
     fn calculate_legal_actions(&mut self, state: &S) -> Vec<LegalActions<A>>;
 
     /// Transition from the current state to the next state
-    /// given a set of player actions.
+    /// given a set of player actions maped from each player ID.
     /// 
-    /// @param actions map of actions to be performed by each player
-    fn state_transition(&mut self, state: &S, actions: &HashMap<usize, A>) -> S;
+    /// ### Arguments
+    /// 
+    /// * `state` - The state from which to transition.
+    /// * `actions` - Map of actions to be performed by each player.
+    /// 
+    /// ### Return Value
+    /// 
+    /// Returns the next state after the actions have been performed.
+    fn state_transition(&mut self, state: &S, actions: &Vec<Option<A>>) -> S;
     
     /// The total number of players in this domain.
+    /// This should be fixed throughout the entire game.
     fn number_of_players(&mut self) -> usize;
+
+    /// Checks if the given state transition is valid.
+    /// The state transition is valid if each player that
+    /// has legal actions has selected a legal action and
+    /// each player that has no legal actions has not selected
+    /// an action.
+    /// 
+    /// ### Arguments
+    /// 
+    /// * `state` - The state from which to transition.
+    /// * `actions` - Map of actions to be performed by each player.
+    /// 
+    /// ### Return Value
+    /// 
+    /// True if the state transition is valid.
+    fn check_valid_state_transition(&mut self, state: &S, actions: &Vec<Option<A>>) -> Result<(), String> {
+        let all_legal_actions = self.calculate_legal_actions(state);
+        if actions.len() != self.number_of_players() {
+            return Err(format!("actions length is {}, while number of players is {}", actions.len(), self.number_of_players()));
+        }
+        for player_id in 0..self.number_of_players() {
+            let legal_actions = &all_legal_actions[player_id];
+            let action = &actions[player_id];
+            if (legal_actions.0.is_empty() && !action.is_none()) ||
+                    (!legal_actions.0.is_empty() && action.is_none()) {
+                return Err(format!("player {} has illegal action", player_id));
+            }
+        }
+        return Ok(());
+    }
 
     /// A state is terminal if no player has any
     /// legal actions from the current state.
@@ -121,6 +163,33 @@ mod tests {
         assert!(!simulator.is_terminal_state(&TestState));
     }
 
+    #[test]
+    fn check_valid_state_transition_actions_vec_too_small() {
+        let mut simulator = TestSimulator {
+            legal_actions: vec![LegalActions::new(), LegalActions::new()],
+        };
+        let actions = vec![];
+        assert!(simulator.check_valid_state_transition(&TestState, &actions).is_err());
+    }
+
+    #[test]
+    fn check_valid_state_transition_actions_vec_too_large() {
+        let mut simulator = TestSimulator {
+            legal_actions: vec![LegalActions::new(), LegalActions::new()],
+        };
+        let actions = vec![None, None, None];
+        assert!(simulator.check_valid_state_transition(&TestState, &actions).is_err());
+    }
+    
+    #[test]
+    fn check_valid_state_transition_actions_vec_all_none() {
+        let mut simulator = TestSimulator {
+            legal_actions: vec![LegalActions::new(), LegalActions::new()],
+        };
+        let actions = vec![None, None];
+        assert!(simulator.check_valid_state_transition(&TestState, &actions).is_ok());
+    }
+
     #[derive(Clone, fmt::Debug, Hash, PartialEq, Eq)]
     struct TestState;
 
@@ -161,7 +230,7 @@ mod tests {
             self.legal_actions.clone()
         }
 
-        fn state_transition(&mut self, _: &TestState, _: &HashMap<usize, TestAction>) -> TestState {
+        fn state_transition(&mut self, _: &TestState, _: &Vec<Option<TestAction>>) -> TestState {
             TestState
         }
         
