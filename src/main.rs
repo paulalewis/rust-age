@@ -1,5 +1,6 @@
 use abstract_game_engine::core::agent::Agent;
 use abstract_game_engine::core::agent::DefaultAgents;
+use abstract_game_engine::core::simulator::Simulator;
 use abstract_game_engine::domains::connect4::connect4_action::Connect4Action;
 use abstract_game_engine::domains::connect4::connect4_simulator::Connect4Simulator;
 use abstract_game_engine::domains::yahtzee::yahtzee_action::YahtzeeAction;

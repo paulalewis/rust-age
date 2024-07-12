@@ -11,5 +11,5 @@ rand_chacha = "0.3.1"
 enum-ordinalize = "3.1.12"
 
 [features]
-default = [domains]
+default = ["domains"]
 domains = []
