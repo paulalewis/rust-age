@@ -131,40 +131,6 @@ use super::{backgammon_action::BackgammonAction, backgammon_state::{BackgammonSt
             }
             return legalActions
         }
-
-        private fun canMove(
-            location: Int,
-            distance: Int,
-            moveOff: Boolean,
-            agentTurn: Int,
-            locations: ByteArray
-        ): Boolean {
-            return if (agentTurn == TURN_PLAYER_1) {
-                val next = location + distance
-                next < BackgammonState.N_LOCATIONS - 1 && locations[next] >= -1 ||
-                        moveOff && next >= BackgammonState.N_LOCATIONS - 1
-            } else {
-                val next = location - distance
-                next > 0 && locations[next] <= 1 || moveOff && next <= 0
-            }
-        }
-
-        /**
-         * Checks if a player can start moving pieces off of the board.
-         * @return true if legal to move off board.
-         */
-        private fun canMoveOff(locations: ByteArray, piece: Int): Boolean {
-            if (piece > 0) {
-                (0..18)
-                    .filter { locations[it] > 0 }
-                    .forEach { _ -> return false }
-            } else {
-                (7 until BackgammonState.N_LOCATIONS)
-                    .filter { locations[it] < 0 }
-                    .forEach { _ -> return false }
-            }
-            return true
-        }
     }
 }*/
 
@@ -218,4 +184,41 @@ impl Simulator<BackgammonState, BackgammonAction> for BackgammonSimulator {
     }
     
     fn number_of_players(&mut self) -> usize { 2 }
+}
+
+impl BackgammonSimulator {
+    fn can_move(
+        location: u8,
+        distance: u8,
+        move_off: bool,
+        p1_turn: bool,
+        locations: [i8; N_LOCATIONS],
+    ) -> bool {
+        if p1_turn {
+            let next = location + distance;
+            next < N_LOCATIONS as u8 - 1 && locations[next as usize] >= -1 ||
+                move_off && next >= N_LOCATIONS as u8 - 1
+        } else {
+            let next = location - distance;
+            next > 0 && locations[next as usize] <= 1 || move_off && next <= 0
+        }
+    }
+    /// Checks if a player can start moving pieces off of the board.
+    /// Return true if legal to move off board.
+    fn can_move_off(locations: &[i8], piece: i8) -> bool {
+        if piece > 0 {
+            for i in 0..18 {
+                if locations[i] > 0 {
+                    return false;
+                }
+            }
+        } else {
+            for i in 7..N_LOCATIONS {
+                if locations[i] < 0 {
+                    return false;
+                }
+            }
+        }
+        true
+    }
 }
